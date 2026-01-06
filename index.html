@@ -469,6 +469,19 @@
                     if (snapshot.exists) {
                         currentMemberDoc = snapshot.data();
                         renderMemberUI();
+                    } else if (currentMemberDoc && currentMemberDoc.status !== 'verified') {
+                        // Document was deleted (rejected by admin)
+                        // Trigger reload and "don't save name" behavior
+                        const content = `
+                            <div style="padding: 10px 0;">
+                                <p style="color: var(--secondary); margin-bottom: 20px; font-weight: 500;">Your payment slip was not accepted. Please try again and upload a correct proof of payment.</p>
+                                <button class="btn" onclick="location.reload()">Try Again & Upload Slip Again</button>
+                            </div>
+                        `;
+                        // Hide standard footer to force the "Try Again" action
+                        document.getElementById('modal-footer').classList.add('hidden');
+                        openModal(`Submission Rejected`, content);
+                        currentMemberDoc = null;
                     }
                 }, (err) => console.error(err));
 
@@ -598,11 +611,9 @@
         }
 
         async function reject(id) {
-            await getCollection().doc(id).update({
-                status: 'unpaid',
-                slip: null
-            });
-            toast("Slip rejected. Member can re-upload.");
+            // Delete the document to "not save their name" and trigger member reload
+            await getCollection().doc(id).delete();
+            toast("Member submission rejected and cleared.");
         }
 
         async function viewSlip(id) {
@@ -680,6 +691,7 @@
         function openModal(title, body) {
             document.getElementById('modal-title').innerText = title;
             document.getElementById('modal-body').innerHTML = body;
+            document.getElementById('modal-footer').classList.remove('hidden');
             document.getElementById('modal').style.display = 'flex';
         }
         function closeModal() { document.getElementById('modal').style.display = 'none'; }
