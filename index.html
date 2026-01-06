@@ -24,6 +24,7 @@
             --warning: #f59e0b;
             --warning-bg: rgba(245, 158, 11, 0.1);
             --danger: #ef4444;
+            --danger-bg: rgba(239, 68, 68, 0.1);
             --border: #334155;
             --radius: 20px;
             --shadow: 0 10px 30px -5px rgba(0, 0, 0, 0.3);
@@ -261,6 +262,15 @@
         footer { text-align: center; padding: 30px 20px; color: var(--muted); font-size: 0.8rem; letter-spacing: 0.05em; }
 
         #ticket-canvas { display: none; }
+
+        /* Animation for check-in message */
+        @keyframes scaleIn {
+            from { transform: scale(0.8); opacity: 0; }
+            to { transform: scale(1); opacity: 1; }
+        }
+        .status-card-animate {
+            animation: scaleIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+        }
     </style>
 </head>
 
@@ -283,7 +293,7 @@
 
     <nav>
         <div class="logo">TICKET HUB</div>
-        <div id="view-tag" class="view-indicator">2026-GET</div>
+        <div id="view-tag" class="view-indicator">ID Verification Active</div>
     </nav>
 
     <div class="container">
@@ -532,12 +542,58 @@
                     if (doc.data().ticketID === idInput) found = { id: doc.id, ...doc.data() };
                 });
 
-                if (!found) return openModal("Error", "Ticket ID not found.");
-                if (found.status !== 'verified') return openModal("Denied", "Payment not verified yet.");
-                if (found.checkedIn === true) return openModal("Invalid", "This ticket was already used for entry.");
+                if (!found) {
+                    return openModal("Error", `
+                        <div style="padding: 10px; text-align: center;" class="status-card-animate">
+                            <div style="width: 70px; height: 70px; background: var(--danger-bg); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 20px; border: 2px solid var(--danger);">
+                                <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="var(--danger)" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                            </div>
+                            <h3 style="color: var(--danger); margin: 0;">Invalid Ticket</h3>
+                            <p style="color: var(--secondary); font-size: 0.9rem; margin-top: 10px;">The provided Ticket ID does not exist in the database.</p>
+                        </div>
+                    `);
+                }
 
-                await getCollection().doc(found.id).update({ checkedIn: true });
-                openModal("Success", `Checked In: ${found.name}`);
+                if (found.status !== 'verified') {
+                    return openModal("Warning", `
+                        <div style="padding: 10px; text-align: center;" class="status-card-animate">
+                            <div style="width: 70px; height: 70px; background: var(--warning-bg); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 20px; border: 2px solid var(--warning);">
+                                <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="var(--warning)" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>
+                            </div>
+                            <h3 style="color: var(--warning); margin: 0;">Not Verified</h3>
+                            <p style="color: var(--secondary); font-size: 0.9rem; margin-top: 10px;">Payment for member <b>${found.name}</b> has not been approved yet.</p>
+                        </div>
+                    `);
+                }
+
+                if (found.checkedIn === true) {
+                    return openModal("Access Denied", `
+                        <div style="padding: 10px; text-align: center;" class="status-card-animate">
+                            <div style="width: 70px; height: 70px; background: var(--danger-bg); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 20px; border: 2px solid var(--danger);">
+                                <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="var(--danger)" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
+                            </div>
+                            <h3 style="color: var(--danger); margin: 0;">Already Checked In</h3>
+                            <p style="color: var(--secondary); font-size: 0.9rem; margin-top: 10px;">Member <b>${found.name}</b> has already used this ticket to enter the venue.</p>
+                        </div>
+                    `);
+                }
+
+                // Success Logic
+                await getCollection().doc(found.id).update({ checkedIn: true, checkedInAt: firebase.firestore.FieldValue.serverTimestamp() });
+                
+                openModal("Success", `
+                    <div style="padding: 10px; text-align: center;" class="status-card-animate">
+                        <div style="width: 80px; height: 80px; background: var(--success-bg); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 20px; border: 2px solid var(--success);">
+                            <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="var(--success)" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                        </div>
+                        <h3 style="color: var(--success); margin: 0 0 10px; font-size: 1.6rem; letter-spacing: -0.02em;">Access Granted</h3>
+                        <p style="color: var(--text); font-weight: 700; font-size: 1.3rem; margin: 5px 0;">${found.name}</p>
+                        <p style="color: var(--secondary); font-size: 0.85rem; margin-bottom: 25px;">Ticket ID: <span style="color: var(--primary); font-family: monospace;">${found.ticketID}</span></p>
+                        <div style="background: rgba(16, 185, 129, 0.08); padding: 14px; border-radius: 16px; border: 1px solid rgba(16, 185, 129, 0.2);">
+                            <p style="color: var(--success); font-size: 0.75rem; font-weight: 800; margin: 0; text-transform: uppercase; letter-spacing: 0.1em;">Check-In Complete • Welcome</p>
+                        </div>
+                    </div>
+                `);
                 document.getElementById('id-verify-input').value = '';
 
             } catch (err) { toast("Error during lookup"); }
