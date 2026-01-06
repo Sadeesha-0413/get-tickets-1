@@ -4,11 +4,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ticket Hub - Dark Edition</title>
+    <title>Ticket Hub - Dark QR Edition</title>
     <!-- Firebase SDKs -->
     <script src="https://www.gstatic.com/firebasejs/11.0.2/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/11.0.2/firebase-firestore-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/11.0.2/firebase-auth-compat.js"></script>
+    <!-- QR Code Library -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 
     <style>
         :root {
@@ -88,6 +90,7 @@
             border-radius: var(--radius);
             border: 1px solid var(--border);
             box-shadow: var(--shadow);
+            margin-bottom: 20px;
         }
 
         h2, h3 {
@@ -149,12 +152,7 @@
             transform: translateY(-2px);
         }
 
-        .btn:active { transform: translateY(0); }
-
-        .btn:disabled {
-            opacity: 0.4;
-            cursor: not-allowed;
-        }
+        .btn:disabled { opacity: 0.4; cursor: not-allowed; }
 
         .btn-ghost {
             background: transparent;
@@ -165,29 +163,9 @@
             border: 1px solid transparent;
         }
 
-        .btn-ghost:hover {
-            color: var(--text);
-            background: rgba(255,255,255,0.05);
-        }
-
-        .btn-sm {
-            padding: 10px 16px;
-            font-size: 0.75rem;
-            width: auto;
-        }
-
+        .btn-sm { padding: 10px 16px; font-size: 0.75rem; width: auto; }
         .btn-success { background: var(--success); }
-        .btn-success:hover { background: #059669; }
-
-        .btn-danger-ghost {
-            background: transparent;
-            color: var(--danger);
-            border: 1px solid rgba(239, 68, 68, 0.2);
-        }
-
-        .btn-danger-ghost:hover {
-            background: rgba(239, 68, 68, 0.1);
-        }
+        .btn-danger-ghost { background: transparent; color: var(--danger); border: 1px solid rgba(239, 68, 68, 0.2); }
 
         .ticket {
             text-align: center;
@@ -204,7 +182,7 @@
             font-weight: 900;
             color: var(--primary);
             display: block;
-            margin: 15px 0;
+            margin: 10px 0;
             letter-spacing: 0.1em;
         }
 
@@ -234,20 +212,8 @@
             text-align: center;
         }
 
-        .summary-val {
-            display: block;
-            font-size: 1.5rem;
-            font-weight: 800;
-            color: var(--primary);
-        }
-
-        .summary-lab {
-            font-size: 0.65rem;
-            font-weight: 600;
-            color: var(--muted);
-            text-transform: uppercase;
-            margin-top: 4px;
-        }
+        .summary-val { display: block; font-size: 1.5rem; font-weight: 800; color: var(--primary); }
+        .summary-lab { font-size: 0.65rem; font-weight: 600; color: var(--muted); text-transform: uppercase; margin-top: 4px; }
 
         .list-item {
             display: flex;
@@ -259,68 +225,47 @@
 
         .modal-overlay {
             position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
+            top: 0; left: 0; width: 100%; height: 100%;
             background: rgba(0, 0, 0, 0.85);
-            display: none;
-            justify-content: center;
-            align-items: center;
-            z-index: 2000;
-            padding: 20px;
-            backdrop-filter: blur(8px);
+            display: none; justify-content: center; align-items: center;
+            z-index: 2000; padding: 20px; backdrop-filter: blur(8px);
         }
 
         .modal-content {
             background: var(--card);
-            padding: 35px;
-            border-radius: 25px;
-            width: 100%;
-            max-width: 440px;
-            text-align: center;
-            max-height: 90vh;
-            overflow-y: auto;
-            border: 1px solid var(--border);
+            padding: 35px; border-radius: 25px;
+            width: 100%; max-width: 440px; text-align: center;
+            max-height: 90vh; overflow-y: auto; border: 1px solid var(--border);
         }
 
         .preview-img {
-            max-width: 100%;
-            border-radius: 15px;
-            margin: 20px 0;
-            border: 1px solid var(--border);
-            box-shadow: 0 20px 40px rgba(0,0,0,0.5);
+            max-width: 100%; border-radius: 15px; margin: 20px 0;
+            border: 1px solid var(--border); box-shadow: 0 20px 40px rgba(0,0,0,0.5);
+        }
+
+        #qr-container {
+            background: white;
+            padding: 10px;
+            display: inline-block;
+            border-radius: 10px;
+            margin: 15px 0;
         }
 
         .hidden { display: none !important; }
 
         #toast {
             position: fixed;
-            top: 25px;
-            left: 50%;
-            transform: translateX(-50%);
-            background: var(--primary);
-            color: white;
-            padding: 14px 28px;
-            border-radius: 14px;
-            font-size: 0.9rem;
-            font-weight: 600;
-            display: none;
-            z-index: 3000;
+            top: 25px; left: 50%; transform: translateX(-50%);
+            background: var(--primary); color: white;
+            padding: 14px 28px; border-radius: 14px;
+            font-size: 0.9rem; font-weight: 600;
+            display: none; z-index: 3000;
             box-shadow: 0 15px 30px rgba(0, 0, 0, 0.4);
         }
 
-        footer {
-            text-align: center;
-            padding: 30px 20px;
-            color: var(--muted);
-            font-size: 0.8rem;
-            letter-spacing: 0.05em;
-        }
+        footer { text-align: center; padding: 30px 20px; color: var(--muted); font-size: 0.8rem; letter-spacing: 0.05em; }
 
-        #ticket-canvas {
-            display: none;
-        }
+        #ticket-canvas { display: none; }
     </style>
 </head>
 
@@ -339,24 +284,24 @@
     </div>
 
     <!-- Hidden canvas for PNG generation -->
-    <canvas id="ticket-canvas" width="600" height="400"></canvas>
+    <canvas id="ticket-canvas" width="600" height="750"></canvas>
 
     <nav>
         <div class="logo">TICKET HUB</div>
-        <div id="view-tag" class="view-indicator">Hello</div>
+        <div id="view-tag" class="view-indicator">QR Validation Active</div>
     </nav>
 
     <div class="container">
         <!-- ENTRY VIEW -->
         <section id="entry-view" class="card">
             <h2>Welcome</h2>
-            <p style="color:var(--secondary); font-size:0.95rem; margin-bottom:25px;">Enter your full name to view or claim your event pass.</p>
+            <p style="color:var(--secondary); font-size:0.95rem; margin-bottom:25px;">Access your digital event pass for verification.</p>
             <div class="form-group">
                 <label>Full Name</label>
-                <input type="text" id="member-name-input" placeholder="e.g. Johny ...">
+                <input type="text" id="member-name-input" placeholder="e.g. John Doe">
             </div>
             <button class="btn" id="access-btn" onclick="memberAccess()">Access My Ticket</button>
-            <button class="btn btn-ghost" onclick="switchView('admin-login')">Admin Panel</button>
+            <button class="btn btn-ghost" onclick="switchView('admin-login')">Administrative Panel</button>
         </section>
 
         <!-- ADMIN LOGIN -->
@@ -386,6 +331,16 @@
 
         <!-- ADMIN DASHBOARD -->
         <section id="admin-dashboard-view" class="hidden">
+            <!-- QR Verification Tool -->
+            <div class="card" style="border: 2px solid var(--primary);">
+                <h3 style="color: var(--primary); text-align: center;">Gate Check-In</h3>
+                <div class="form-group">
+                    <label>Scan / Enter Ticket ID</label>
+                    <input type="text" id="qr-scan-input" placeholder="e.g. ID-12345" style="text-align: center; text-transform: uppercase;">
+                </div>
+                <button class="btn" onclick="validateTicketQR()">Validate & Check-In</button>
+            </div>
+
             <div class="card">
                 <h3 style="font-size: 0.9rem; text-align: center; text-transform: uppercase; margin-bottom: 25px; letter-spacing: 0.1em;">Management Overview</h3>
                 <div id="admin-stats-summary" class="summary-grid"></div>
@@ -396,7 +351,7 @@
                 </div>
 
                 <div style="border-top: 1px solid var(--border); margin-top: 30px; padding-top: 20px;">
-                    <label>Verified Access List</label>
+                    <label>All Verified Passes</label>
                     <div id="admin-all-list" style="max-height: 300px; overflow-y: auto;"></div>
                 </div>
 
@@ -443,10 +398,7 @@
                     await auth.signInAnonymously();
                 }
                 authInitialized = true;
-            } catch (e) {
-                console.error("Auth error:", e);
-                toast("System connection error");
-            }
+            } catch (e) { toast("System connection error"); }
         }
 
         function toast(msg) {
@@ -465,7 +417,7 @@
         // --- 2. MEMBER FLOW ---
         async function memberAccess() {
             const name = document.getElementById('member-name-input').value.trim();
-            if (!name) return toast("Name is required to verify ticket");
+            if (!name) return toast("Name is required");
 
             const btn = document.getElementById('access-btn');
             btn.disabled = true;
@@ -485,6 +437,7 @@
                         status: 'unpaid',
                         ticketID: 'ID-' + Math.floor(10000 + Math.random() * 89999),
                         slip: null,
+                        checkedIn: false,
                         createdAt: firebase.firestore.FieldValue.serverTimestamp()
                     };
                     await memberRef.set(newMember);
@@ -501,26 +454,12 @@
                         currentMemberDoc = snapshot.data();
                         renderMemberUI();
                     } else if (currentMemberDoc && currentMemberDoc.status !== 'verified') {
-                        // Document rejected/deleted logic
-                        const content = `
-                            <div style="padding: 10px 0;">
-                                <p style="color: var(--secondary); margin-bottom: 20px; line-height: 1.6;">
-                                    Your submission was not verified by the administrator. 
-                                    <br><br>
-                                    <b>Action Required:</b> Try again and upload slip again.
-                                </p>
-                                <button class="btn" onclick="location.reload()">Return & Try Again</button>
-                            </div>
-                        `;
-                        document.getElementById('modal-footer').classList.add('hidden');
-                        openModal(`Slip Not Verified`, content);
-                        currentMemberDoc = null;
+                        location.reload();
                     }
-                }, (err) => console.error(err));
+                });
 
-            } catch (e) {
-                toast("Error connecting to database");
-            } finally {
+            } catch (e) { toast("Connection error"); } 
+            finally {
                 btn.disabled = false;
                 btn.innerText = "Access My Ticket";
             }
@@ -532,61 +471,107 @@
             const u = currentMemberDoc;
             const isOk = u.status === 'verified';
             const isWaiting = u.status === 'waiting';
+            const isCheckedIn = u.checkedIn === true;
 
             display.innerHTML = `
                 <div class="ticket">
-                    <span class="badge ${isOk ? 'badge-ok' : 'badge-wait'}">
-                        ${isOk ? 'Access Granted' : (isWaiting ? 'Pending Review' : 'Payment Required')}
+                    <span class="badge ${isCheckedIn ? 'badge-ok' : (isOk ? 'badge-ok' : 'badge-wait')}">
+                        ${isCheckedIn ? 'Checked In' : (isOk ? 'Verified Access' : (isWaiting ? 'Pending Review' : 'Payment Required'))}
                     </span>
                     <span class="ticket-no">${u.ticketID}</span>
                     <p style="font-weight:700; font-size:1.2rem; margin:0; color: white;">${u.name}</p>
-                    <p style="font-size: 0.85rem; color: var(--secondary); margin-top: 10px;">
-                        Event: Ahaspokuna hotel
+                    <div id="qr-display" class="${isOk ? '' : 'hidden'}">
+                        <div id="qr-container"></div>
+                        <p style="font-size: 0.75rem; color: var(--secondary); margin-top: 5px;">Scan at gate for entry</p>
+                    </div>
+                    <p style="font-size: 0.8rem; color: var(--secondary); margin-top: 10px;">
+                        Ahaspokuna hotel | 9:00 AM
                     </p>
                 </div>
                 ${isOk ? `<button class="btn btn-success" onclick="downloadTicketFromData()">Download Digital Pass</button>` : ''}
             `;
 
+            if (isOk) {
+                setTimeout(() => {
+                    document.getElementById('qr-container').innerHTML = '';
+                    new QRCode(document.getElementById("qr-container"), {
+                        text: u.ticketID,
+                        width: 140,
+                        height: 140,
+                        colorDark : "#000000",
+                        colorLight : "#ffffff",
+                    });
+                }, 100);
+            }
+
             if (u.status === 'unpaid') upload.classList.remove('hidden');
             else if (isWaiting) {
-                upload.innerHTML = `
-                    <div style="text-align:center; padding: 20px; background: rgba(255,255,255,0.03); border-radius: 12px; border: 1px solid var(--border);">
-                        <p style="font-size:0.9rem; color:var(--primary); margin: 0;">Verification in progress...</p>
-                        <p style="font-size:0.75rem; color:var(--muted); margin-top: 5px;">Our team is reviewing your receipt.</p>
-                    </div>
-                `;
+                upload.innerHTML = `<div style="text-align:center; padding: 20px; background: rgba(255,255,255,0.03); border-radius: 12px; border: 1px solid var(--border);">
+                    <p style="color:var(--primary);">Verification in progress...</p>
+                </div>`;
                 upload.classList.remove('hidden');
             } else upload.classList.add('hidden');
         }
 
         function uploadPayment() {
             const file = document.getElementById('slip-upload-input').files[0];
-            if (!file) return toast("Please select a file to upload");
-
+            if (!file) return toast("Please select a file");
             const btn = document.getElementById('upload-btn');
-            btn.innerText = "Uploading Receipt...";
             btn.disabled = true;
-
             const reader = new FileReader();
             reader.onload = async (e) => {
                 const docId = currentMemberDoc.name.toLowerCase().replace(/\s+/g, '_');
-                try {
-                    await getCollection().doc(docId).update({
-                        status: 'waiting',
-                        slip: e.target.result
-                    });
-                    toast("Slip submitted successfully");
-                } catch (err) {
-                    toast("Upload failed. Try again.");
-                } finally {
-                    btn.innerText = "Upload Slip";
-                    btn.disabled = false;
-                }
+                await getCollection().doc(docId).update({ status: 'waiting', slip: e.target.result });
+                toast("Slip submitted");
+                btn.disabled = false;
             };
             reader.readAsDataURL(file);
         }
 
-        // --- 3. ADMIN DASHBOARD ---
+        // --- 3. ADMIN TOOLS ---
+        async function validateTicketQR() {
+            const idInput = document.getElementById('qr-scan-input').value.trim().toUpperCase();
+            if (!idInput) return toast("Enter a valid Ticket ID");
+
+            toast("Searching record...");
+            
+            try {
+                const querySnapshot = await getCollection().get();
+                let found = null;
+                querySnapshot.forEach(doc => {
+                    if (doc.data().ticketID === idInput) found = { id: doc.id, ...doc.data() };
+                });
+
+                if (!found) {
+                    openModal("Invalid Pass", "<p style='color:var(--danger)'>This Ticket ID does not exist in our system.</p>");
+                    return;
+                }
+
+                if (found.status !== 'verified') {
+                    openModal("Access Denied", "<p style='color:var(--warning)'>This member is not yet verified for entry.</p>");
+                    return;
+                }
+
+                if (found.checkedIn === true) {
+                    openModal("Entry Refused", `<div style='padding:15px; background:rgba(239,68,68,0.1); border-radius:10px;'>
+                        <p style='color:var(--danger); font-weight:bold; font-size:1.2rem;'>ALREADY CHECKED IN</p>
+                        <p style='color:var(--secondary); font-size:0.8rem;'>Member: ${found.name}<br>This ticket has already been used for entry.</p>
+                    </div>`);
+                    return;
+                }
+
+                // Success Check-in
+                await getCollection().doc(found.id).update({ checkedIn: true, checkedInAt: firebase.firestore.FieldValue.serverTimestamp() });
+                openModal("Access Granted", `<div style='padding:20px; background:rgba(16,185,129,0.1); border-radius:15px; border: 1px solid var(--success)'>
+                    <p style='color:var(--success); font-weight:800; font-size:1.4rem; margin:0;'>WELCOME</p>
+                    <p style='color:white; font-size:1.1rem; margin:10px 0;'>${found.name}</p>
+                    <p style='color:var(--secondary); font-size:0.8rem;'>${found.ticketID} verified successfully.</p>
+                </div>`);
+                document.getElementById('qr-scan-input').value = '';
+
+            } catch (err) { toast("Error during validation"); }
+        }
+
         function adminLogin() {
             if (document.getElementById('admin-pass-input').value === MASTER_PASS) {
                 initAuth().then(() => switchView('admin-dashboard'));
@@ -599,9 +584,8 @@
             adminUnsubscribe = getCollection().onSnapshot((snapshot) => {
                 const users = [];
                 snapshot.forEach(doc => users.push({ id: doc.id, ...doc.data() }));
-                users.sort((a, b) => (b.createdAt?.seconds || 0) - (a.createdAt?.seconds || 0));
                 renderAdminUI(users);
-            }, (err) => toast("Dashboard access restricted"));
+            });
         }
 
         function renderAdminUI(users) {
@@ -611,154 +595,109 @@
 
             const waiting = users.filter(u => u.status === 'waiting');
             const verified = users.filter(u => u.status === 'verified');
-            const unpaid = users.filter(u => u.status === 'unpaid');
+            const checkedIn = users.filter(u => u.checkedIn === true).length;
 
             stats.innerHTML = `
                 <div class="summary-card"><span class="summary-val">${users.length}</span><span class="summary-lab">Users</span></div>
-                <div class="summary-card"><span class="summary-val" style="color:var(--warning)">${waiting.length}</span><span class="summary-lab">Queued</span></div>
-                <div class="summary-card"><span class="summary-val" style="color:var(--success)">${verified.length}</span><span class="summary-lab">Verified</span></div>
-                <div class="summary-card"><span class="summary-val" style="color:var(--secondary)">${unpaid.length}</span><span class="summary-lab">Unpaid</span></div>
+                <div class="summary-card"><span class="summary-val" style="color:var(--warning)">${waiting.length}</span><span class="summary-lab">Queue</span></div>
+                <div class="summary-card"><span class="summary-val" style="color:var(--success)">${verified.length}</span><span class="summary-lab">Passes</span></div>
+                <div class="summary-card"><span class="summary-val" style="color:var(--primary)">${checkedIn}</span><span class="summary-lab">Inside</span></div>
             `;
 
-            queue.innerHTML = waiting.length ? '' : '<p style="font-size:0.75rem; color:var(--muted); text-align:center; padding: 15px;">No active requests</p>';
+            queue.innerHTML = '';
             waiting.forEach(u => {
-                const div = document.createElement('div');
-                div.className = 'list-item';
-                div.innerHTML = `
-                    <div style="font-size:0.85rem; font-weight:600;">${u.name}</div>
-                    <div style="display:flex; gap:8px;">
-                        <button class="btn btn-sm btn-ghost" onclick="viewSlip('${u.id}')">Proof</button>
-                        <button class="btn btn-sm" onclick="approve('${u.id}')">Verify</button>
-                        <button class="btn btn-sm btn-danger-ghost" onclick="reject('${u.id}')">Reject</button>
-                    </div>
-                `;
+                const div = document.createElement('div'); div.className = 'list-item';
+                div.innerHTML = `<div style="font-size:0.85rem;">${u.name}</div><div style="display:flex; gap:5px;">
+                    <button class="btn btn-sm btn-ghost" onclick="viewSlip('${u.id}')">Slip</button>
+                    <button class="btn btn-sm" onclick="approve('${u.id}')">OK</button>
+                    <button class="btn btn-sm btn-danger-ghost" onclick="reject('${u.id}')">X</button>
+                </div>`;
                 queue.appendChild(div);
             });
 
-            all.innerHTML = verified.length ? '' : '<p style="font-size:0.75rem; color:var(--muted); text-align:center; padding: 15px;">No verified members</p>';
+            all.innerHTML = '';
             verified.forEach(u => {
-                const div = document.createElement('div');
-                div.className = 'list-item';
-                div.innerHTML = `
-                    <div style="font-size:0.85rem;">${u.name} <small style="color:var(--muted)">(${u.ticketID})</small></div>
-                    <div style="display:flex; gap:6px; flex-wrap: wrap; justify-content: flex-end;">
-                        <button class="btn btn-sm btn-ghost" onclick="viewSlip('${u.id}')">Receipt</button>
-                        <button class="btn btn-sm btn-ghost" onclick="viewCopy('${u.id}')">Preview</button>
-                        <button class="btn btn-sm btn-success" onclick="downloadTicketFromId('${u.id}')">Get Pass</button>
-                    </div>
-                `;
+                const div = document.createElement('div'); div.className = 'list-item';
+                div.innerHTML = `<div style="font-size:0.85rem;">${u.name} <small style="color:${u.checkedIn ? 'var(--success)' : 'var(--muted)'}">${u.checkedIn ? '• IN' : '• IDLE'}</small></div>
+                    <div style="display:flex; gap:4px;"><button class="btn btn-sm btn-ghost" onclick="viewCopy('${u.id}')">View</button>
+                    <button class="btn btn-sm btn-success" onclick="downloadTicketFromId('${u.id}')">Pass</button></div>`;
                 all.appendChild(div);
             });
         }
 
-        async function approve(id) {
-            await getCollection().doc(id).update({ status: 'verified' });
-            toast("Access granted successfully");
-        }
-
-        async function reject(id) {
-            // Delete doc to reset and trigger member message
-            await getCollection().doc(id).delete();
-            toast("Submission rejected and record cleared");
-        }
+        async function approve(id) { await getCollection().doc(id).update({ status: 'verified' }); }
+        async function reject(id) { await getCollection().doc(id).delete(); }
 
         async function viewSlip(id) {
             const doc = await getCollection().doc(id).get();
-            const u = doc.data();
-            if (!u.slip) return toast("Proof of payment missing");
-            openModal(`Payment Slip: ${u.name}`, `<img src="${u.slip}" class="preview-img">`);
+            openModal(`Slip: ${doc.data().name}`, `<img src="${doc.data().slip}" class="preview-img">`);
         }
 
         async function viewCopy(id) {
             const doc = await getCollection().doc(id).get();
             const u = doc.data();
-            const content = `
-                <div class="ticket">
-                    <span class="badge badge-ok">Verified Access</span>
-                    <span class="ticket-no">${u.ticketID}</span>
-                    <p style="font-weight:700; color: white;">${u.name}</p>
-                    <p style="font-size: 0.8rem; color: var(--secondary); margin-top: 10px;">Ahaspokuna hotel</p>
-                </div>
-                <p style="font-size: 0.7rem; color: var(--muted); margin-top: 10px;">Authenticated Admin Preview</p>
-            `;
-            openModal(`Digital Pass Preview`, content);
+            openModal(`Pass Preview`, `<div class="ticket">
+                <span class="badge badge-ok">${u.checkedIn ? 'CHECKED IN' : 'VALID'}</span>
+                <span class="ticket-no">${u.ticketID}</span>
+                <p style="color:white;">${u.name}</p>
+            </div>`);
         }
 
         // --- 4. TICKET ENGINE ---
+        async function generateTicket(u) {
+            const canvas = document.getElementById('ticket-canvas');
+            const ctx = canvas.getContext('2d');
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            // BG & Borders
+            ctx.fillStyle = '#1e293b'; ctx.fillRect(0, 0, canvas.width, canvas.height);
+            ctx.strokeStyle = '#3b82f6'; ctx.lineWidth = 15; ctx.strokeRect(0, 0, canvas.width, canvas.height);
+            ctx.setLineDash([10, 10]); ctx.lineWidth = 2; ctx.strokeRect(30, 30, canvas.width - 60, canvas.height - 60); ctx.setLineDash([]);
+
+            // Header & Content
+            ctx.fillStyle = '#3b82f6'; ctx.font = 'bold 24px Arial'; ctx.textAlign = 'center'; ctx.fillText('EVENT ACCESS PASS', canvas.width/2, 80);
+            ctx.fillStyle = '#ffffff'; ctx.font = '900 65px Arial'; ctx.fillText(u.ticketID, canvas.width/2, 170);
+            ctx.fillStyle = '#3b82f6'; ctx.font = 'bold 30px Arial'; ctx.fillText(u.name.toUpperCase(), canvas.width/2, 230);
+            
+            // Details
+            ctx.fillStyle = '#f8fafc'; ctx.font = '18px Arial';
+            ctx.fillText('Venue: Ahaspokuna hotel', canvas.width/2, 280);
+            ctx.fillText('Time: 9.00 am to 4.00 pm', canvas.width/2, 310);
+
+            // QR Code (Generate on canvas)
+            const qrTemp = document.createElement('div');
+            new QRCode(qrTemp, { text: u.ticketID, width: 200, height: 200 });
+            
+            setTimeout(() => {
+                const qrImg = qrTemp.querySelector('img');
+                if (qrImg) {
+                    ctx.fillStyle = 'white'; ctx.fillRect(canvas.width/2 - 110, 350, 220, 220);
+                    ctx.drawImage(qrImg, canvas.width/2 - 100, 360, 200, 200);
+                }
+                
+                ctx.fillStyle = '#64748b'; ctx.font = '14px Arial'; ctx.fillText('Valid for single entry. Scan at gate.', canvas.width/2, 700);
+                
+                const link = document.createElement('a');
+                link.download = `Pass_${u.name.replace(/\s+/g, '_')}.png`;
+                link.href = canvas.toDataURL('image/png');
+                link.click();
+                toast("Ticket Pass Generated!");
+            }, 300);
+        }
+
         function downloadTicketFromData() { generateTicket(currentMemberDoc); }
         async function downloadTicketFromId(id) {
             const doc = await getCollection().doc(id).get();
             generateTicket(doc.data());
         }
 
-        function generateTicket(u) {
-            const canvas = document.getElementById('ticket-canvas');
-            const ctx = canvas.getContext('2d');
-            
-            // Clean Canvas
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-            // Background Fill (Deep Slate)
-            ctx.fillStyle = '#1e293b';
-            ctx.fillRect(0, 0, canvas.width, canvas.height);
-            
-            // Decorative Border
-            ctx.strokeStyle = '#3b82f6';
-            ctx.lineWidth = 15;
-            ctx.strokeRect(0, 0, canvas.width, canvas.height);
-            
-            // Dashed Inner Border
-            ctx.strokeStyle = '#3b82f6';
-            ctx.lineWidth = 2;
-            ctx.setLineDash([10, 10]);
-            ctx.strokeRect(30, 30, canvas.width - 60, canvas.height - 60);
-            ctx.setLineDash([]);
-            
-            // Header
-            ctx.fillStyle = '#3b82f6';
-            ctx.font = 'bold 24px Arial';
-            ctx.textAlign = 'center';
-            ctx.fillText('OFFICIAL EVENT ACCESS PASS', canvas.width/2, 80);
-            
-            // Ticket ID (Big and Bold)
-            ctx.fillStyle = '#ffffff';
-            ctx.font = '900 65px Arial';
-            ctx.fillText(u.ticketID, canvas.width/2, 180);
-            
-            // Member Name
-            ctx.fillStyle = '#3b82f6';
-            ctx.font = 'bold 30px Arial';
-            ctx.fillText(u.name.toUpperCase(), canvas.width/2, 235);
-            
-            // Event Details Section
-            ctx.fillStyle = '#f8fafc';
-            ctx.font = '18px Arial';
-            ctx.fillText('Venue: Ahaspokuna hotel', canvas.width/2, 290);
-            ctx.fillText('Time: 9.00 am to 4.00 pm', canvas.width/2, 320);
-            
-            // Footer
-            ctx.fillStyle = '#64748b';
-            ctx.font = '14px Arial';
-            ctx.fillText('Valid for single entry. Pass is non-transferable.', canvas.width/2, 365);
-            
-            // Export and Download
-            const link = document.createElement('a');
-            link.download = `EventPass_${u.name.replace(/\s+/g, '_')}.png`;
-            link.href = canvas.toDataURL('image/png');
-            link.click();
-            toast("Generating PNG... Download started.");
-        }
-
-        // --- 5. MODAL & STATE ---
         function openModal(title, body) {
             document.getElementById('modal-title').innerText = title;
             document.getElementById('modal-body').innerHTML = body;
-            document.getElementById('modal-footer').classList.remove('hidden');
             document.getElementById('modal').style.display = 'flex';
         }
         function closeModal() { document.getElementById('modal').style.display = 'none'; }
         function logout() { location.reload(); }
-        
         window.onload = initAuth;
     </script>
 </body>
