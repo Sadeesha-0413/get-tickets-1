@@ -293,7 +293,7 @@
 
     <nav>
         <div class="logo">TICKET HUB</div>
-        <div id="view-tag" class="view-indicator">QR Validation Active</div>
+        <div id="view-tag" class="view-indicator">GET-2026</div>
     </nav>
 
     <div class="container">
@@ -303,7 +303,7 @@
             <p style="color:var(--secondary); font-size:0.95rem; margin-bottom:25px;">Access your digital event pass for verification.</p>
             <div class="form-group">
                 <label>Full Name</label>
-                <input type="text" id="member-name-input" placeholder="e.g. John Doe">
+                <input type="text" id="member-name-input" placeholder="e.g. Johny ...">
             </div>
             <button class="btn" id="access-btn" onclick="memberAccess()">Access My Ticket</button>
             <button class="btn btn-ghost" onclick="switchView('admin-login')">Administrative Panel</button>
@@ -340,8 +340,8 @@
             <div class="card" style="border: 2px solid var(--primary);">
                 <h3 style="color: var(--primary); text-align: center;">Gate Check-In</h3>
                 <div class="form-group">
-                    <label>Scan / Enter Ticket ID</label>
-                    <input type="text" id="qr-scan-input" placeholder="e.g. ID-12345" style="text-align: center; text-transform: uppercase;">
+                    <label>Enter Ticket ID</label>
+                    <input type="text" id="qr-scan-input" placeholder="e.g. T12345" style="text-align: center; text-transform: uppercase;">
                 </div>
                 <button class="btn" onclick="validateTicketQR()">Validate & Check-In</button>
             </div>
@@ -440,7 +440,7 @@
                     const newMember = {
                         name: name,
                         status: 'unpaid',
-                        ticketID: 'ID-' + Math.floor(10000 + Math.random() * 89999),
+                        ticketID: 'T' + Math.floor(10000 + Math.random() * 89999),
                         slip: null,
                         checkedIn: false,
                         createdAt: firebase.firestore.FieldValue.serverTimestamp()
