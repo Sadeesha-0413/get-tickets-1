@@ -586,7 +586,6 @@
                         <button class="btn btn-sm btn-ghost" onclick="viewSlip('${u.id}')">Slip</button>
                         <button class="btn btn-sm btn-ghost" onclick="viewCopy('${u.id}')">View</button>
                         <button class="btn btn-sm btn-success" onclick="downloadTicketFromId('${u.id}')">PNG</button>
-                        <button class="btn btn-sm btn-danger-ghost" onclick="reject('${u.id}')">Reject</button>
                     </div>
                 `;
                 all.appendChild(div);
@@ -599,7 +598,6 @@
         }
 
         async function reject(id) {
-            // No custom modal/confirm needed, direct update
             await getCollection().doc(id).update({
                 status: 'unpaid',
                 slip: null
