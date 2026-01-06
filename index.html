@@ -163,6 +163,11 @@
             border: 1px solid transparent;
         }
 
+        .btn-ghost:hover {
+            color: var(--text);
+            background: rgba(255,255,255,0.05);
+        }
+
         .btn-sm { padding: 10px 16px; font-size: 0.75rem; width: auto; }
         .btn-success { background: var(--success); }
         .btn-danger-ghost { background: transparent; color: var(--danger); border: 1px solid rgba(239, 68, 68, 0.2); }
@@ -435,7 +440,7 @@
                     const newMember = {
                         name: name,
                         status: 'unpaid',
-                        ticketID: 'T' + Math.floor(10000 + Math.random() * 89999),
+                        ticketID: 'ID-' + Math.floor(10000 + Math.random() * 89999),
                         slip: null,
                         checkedIn: false,
                         createdAt: firebase.firestore.FieldValue.serverTimestamp()
@@ -619,7 +624,9 @@
             verified.forEach(u => {
                 const div = document.createElement('div'); div.className = 'list-item';
                 div.innerHTML = `<div style="font-size:0.85rem;">${u.name} <small style="color:${u.checkedIn ? 'var(--success)' : 'var(--muted)'}">${u.checkedIn ? '• IN' : '• IDLE'}</small></div>
-                    <div style="display:flex; gap:4px;"><button class="btn btn-sm btn-ghost" onclick="viewCopy('${u.id}')">View</button>
+                    <div style="display:flex; gap:4px; flex-wrap: wrap; justify-content: flex-end;">
+                    <button class="btn btn-sm btn-ghost" onclick="viewSlip('${u.id}')">Slip</button>
+                    <button class="btn btn-sm btn-ghost" onclick="viewCopy('${u.id}')">View</button>
                     <button class="btn btn-sm btn-success" onclick="downloadTicketFromId('${u.id}')">Pass</button></div>`;
                 all.appendChild(div);
             });
@@ -630,7 +637,23 @@
 
         async function viewSlip(id) {
             const doc = await getCollection().doc(id).get();
-            openModal(`Slip: ${doc.data().name}`, `<img src="${doc.data().slip}" class="preview-img">`);
+            const u = doc.data();
+            if (!u.slip) return toast("No slip found");
+            const content = `
+                <div style="margin-bottom: 15px;">
+                    <img src="${u.slip}" class="preview-img" style="margin-top:0;">
+                </div>
+                <button class="btn btn-success" onclick="downloadFile('${u.name}_Slip', '${u.slip}')">Download Payment Slip</button>
+            `;
+            openModal(`Payment Slip: ${u.name}`, content);
+        }
+
+        function downloadFile(fileName, dataUrl) {
+            const link = document.createElement('a');
+            link.download = `${fileName.replace(/\s+/g, '_')}.png`;
+            link.href = dataUrl;
+            link.click();
+            toast("Download started");
         }
 
         async function viewCopy(id) {
