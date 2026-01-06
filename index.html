@@ -2,302 +2,565 @@
 <html lang="en">
 
 <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Ticket Hub</title>
-
-    <!-- Firebase -->
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ticket Hub - Cloud Edition</title>
+    <!-- Firebase SDKs -->
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
-
-    <!-- QR -->
-    <script src="https://cdn.jsdelivr.net/npm/qrcodejs/qrcode.min.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
 
     <style>
+        :root {
+            --primary: #2563eb;
+            --primary-dark: #1d4ed8;
+            --secondary: #64748b;
+            --bg: #f8fafc;
+            --card: #ffffff;
+            --text: #0f172a;
+            --muted: #94a3b8;
+            --success: #10b981;
+            --success-bg: #ecfdf5;
+            --warning: #f59e0b;
+            --warning-bg: #fffbeb;
+            --border: #e2e8f0;
+            --radius: 16px;
+            --shadow: 0 10px 25px -5px rgba(37, 99, 235, 0.1);
+        }
+
+        * {
+            box-sizing: border-box;
+            font-family: 'Inter', sans-serif;
+            -webkit-font-smoothing: antialiased;
+        }
+
         body {
             margin: 0;
-            font-family: Arial, sans-serif;
-            background: #f1f5f9;
+            background-color: var(--bg);
+            color: var(--text);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
         }
 
         nav {
-            background: #2563eb;
+            background: var(--card);
+            padding: 15px 25px;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .logo {
+            font-weight: 800;
+            color: var(--primary);
+            letter-spacing: -0.05em;
+            font-size: 1.2rem;
+        }
+
+        .view-indicator {
+            font-size: 0.7rem;
+            font-weight: 700;
+            padding: 4px 10px;
+            border-radius: 20px;
+            text-transform: uppercase;
+        }
+
+        .view-member {
+            background: var(--bg);
+            color: var(--secondary);
+        }
+
+        .view-admin {
+            background: #1e293b;
             color: #fff;
-            padding: 15px;
-            text-align: center;
-            font-weight: bold;
         }
 
         .container {
-            max-width: 420px;
-            margin: 30px auto;
-            padding: 20px;
+            width: 100%;
+            max-width: 480px;
+            margin: 40px auto;
+            padding: 0 20px;
+            flex: 1;
         }
 
         .card {
-            background: #fff;
-            padding: 25px;
-            border-radius: 14px;
-            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
+            background: var(--card);
+            padding: 30px;
+            border-radius: var(--radius);
+            border: 1px solid var(--border);
+            box-shadow: var(--shadow);
         }
 
-        input,
-        button {
+        h2,
+        h3 {
+            margin: 0 0 15px;
+            color: var(--text);
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            font-size: 0.75rem;
+            font-weight: 700;
+            margin-bottom: 8px;
+            color: var(--primary);
+            text-transform: uppercase;
+        }
+
+        input {
             width: 100%;
-            padding: 12px;
-            margin-top: 12px;
-            border-radius: 10px;
-            border: 1px solid #ddd;
+            padding: 12px 16px;
+            border: 2px solid #f1f5f9;
+            border-radius: 12px;
+            font-size: 1rem;
+            outline: none;
         }
 
-        button {
-            background: #2563eb;
+        input:focus {
+            border-color: var(--primary);
+            background: #fff;
+        }
+
+        .btn {
+            width: 100%;
+            background: var(--primary);
             color: white;
             border: none;
+            padding: 14px;
+            border-radius: 12px;
+            font-weight: 700;
             cursor: pointer;
-            font-weight: bold;
+            transition: 0.2s;
+            font-size: 0.95rem;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 8px;
         }
 
-        button.ghost {
+        .btn:hover {
+            background: var(--primary-dark);
+            transform: translateY(-1px);
+        }
+
+        .btn-ghost {
             background: transparent;
-            color: #555;
+            color: var(--secondary);
+            margin-top: 10px;
+            font-weight: 500;
+            font-size: 0.85rem;
+        }
+
+        .btn-sm {
+            padding: 8px 14px;
+            font-size: 0.75rem;
+            width: auto;
         }
 
         .ticket {
-            border: 2px dashed #2563eb;
-            border-radius: 16px;
-            padding: 20px;
             text-align: center;
-            margin-bottom: 15px;
+            padding: 25px;
+            border-radius: 16px;
+            border: 2px dashed var(--primary);
+            background: #fff;
+            margin-bottom: 20px;
+        }
+
+        .ticket-no {
+            font-size: 2rem;
+            font-weight: 900;
+            color: var(--primary);
+            display: block;
+            margin: 10px 0;
         }
 
         .badge {
-            padding: 4px 10px;
-            font-size: 12px;
+            font-size: 0.65rem;
+            font-weight: 800;
+            padding: 4px 12px;
             border-radius: 20px;
-            display: inline-block;
-            margin-bottom: 10px;
+            text-transform: uppercase;
         }
 
-        .ok {
-            background: #dcfce7;
-            color: #15803d;
+        .badge-wait {
+            background: var(--warning-bg);
+            color: var(--warning);
         }
 
-        .wait {
-            background: #fef3c7;
-            color: #b45309;
+        .badge-ok {
+            background: var(--success-bg);
+            color: var(--success);
+        }
+
+        .summary-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            margin-bottom: 25px;
+        }
+
+        .summary-card {
+            background: #f8fafc;
+            padding: 15px;
+            border-radius: 12px;
+            border: 1px solid var(--border);
+            text-align: center;
+        }
+
+        .summary-val {
+            display: block;
+            font-size: 1.3rem;
+            font-weight: 800;
+            color: var(--primary);
+        }
+
+        .summary-lab {
+            font-size: 0.6rem;
+            font-weight: 600;
+            color: var(--secondary);
+            text-transform: uppercase;
+        }
+
+        .list-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 0;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 2000;
+            padding: 20px;
+            backdrop-filter: blur(4px);
+        }
+
+        .modal-content {
+            background: white;
+            padding: 30px;
+            border-radius: 20px;
+            width: 100%;
+            max-width: 400px;
+            text-align: center;
+        }
+
+        .preview-img {
+            max-width: 100%;
+            border-radius: 12px;
+            margin: 15px 0;
+            border: 1px solid var(--border);
         }
 
         .hidden {
             display: none;
         }
 
-        .admin-item {
-            border-bottom: 1px solid #eee;
-            padding: 10px 0;
-        }
-
-        .admin-item button {
-            width: auto;
-            font-size: 12px;
-            padding: 6px 10px;
-            margin-right: 5px;
+        #toast {
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #1e293b;
+            color: white;
+            padding: 12px 24px;
+            border-radius: 12px;
+            font-size: 0.85rem;
+            display: none;
+            z-index: 3000;
+            box-shadow: 0 10px 15px rgba(0, 0, 0, 0.1);
         }
     </style>
 </head>
 
 <body>
 
-    <nav>TICKET HUB</nav>
+    <div id="toast"></div>
 
-    <div class="container">
-
-        <!-- ENTRY -->
-        <div id="entry" class="card">
-            <h3>Enter Your Name</h3>
-            <input id="nameInput" placeholder="Your full name" />
-            <button onclick="memberAccess()">View Ticket</button>
-            <button class="ghost" onclick="showAdmin()">Admin Panel</button>
-        </div>
-
-        <!-- MEMBER -->
-        <div id="member" class="card hidden">
-            <div id="ticketBox"></div>
-            <input type="file" id="slipInput" accept="image/*" />
-            <button onclick="uploadSlip()">Upload Payment Slip</button>
-            <button class="ghost" onclick="logout()">Logout</button>
-        </div>
-
-        <!-- ADMIN -->
-        <div id="admin" class="card hidden">
-            <input id="adminPass" type="password" placeholder="Admin Password" />
-            <button onclick="adminLogin()">Login</button>
-        </div>
-
-        <!-- DASHBOARD -->
-        <div id="dashboard" class="card hidden">
-            <h3>Admin Dashboard</h3>
-            <div id="adminList"></div>
-            <button class="ghost" onclick="logout()">Logout</button>
+    <div id="modal" class="modal-overlay" onclick="closeModal()">
+        <div class="modal-content" onclick="event.stopPropagation()">
+            <h3 id="modal-title"></h3>
+            <div id="modal-body"></div>
+            <button class="btn btn-ghost" onclick="closeModal()">Close</button>
         </div>
     </div>
 
+    <nav>
+        <div class="logo">TICKET HUB</div>
+        <div id="view-tag" class="view-indicator">Cloud Connected</div>
+    </nav>
+
+    <div class="container">
+        <!-- ENTRY VIEW -->
+        <section id="entry-view" class="card">
+            <h2>Welcome</h2>
+            <p style="color:var(--secondary); font-size:0.9rem; margin-bottom:25px;">Enter your name to access your
+                ticket.</p>
+            <div class="form-group">
+                <label>Full Name</label>
+                <input type="text" id="member-name-input" placeholder="e.g. John Doe">
+            </div>
+            <button class="btn" onclick="memberAccess()">View Ticket</button>
+            <button class="btn btn-ghost" onclick="switchView('admin-login')">Admin Panel</button>
+        </section>
+
+        <!-- ADMIN LOGIN -->
+        <section id="admin-login-view" class="card hidden">
+            <h2>Admin Login</h2>
+            <div class="form-group">
+                <label>Password</label>
+                <input type="password" id="admin-pass-input" placeholder="••••••••">
+            </div>
+            <button class="btn" onclick="adminLogin()">Login</button>
+            <button class="btn btn-ghost" onclick="switchView('entry')">Cancel</button>
+        </section>
+
+        <!-- MEMBER PORTAL -->
+        <section id="member-portal-view" class="hidden">
+            <div class="card">
+                <div id="member-ticket-display"></div>
+                <div id="upload-zone" class="hidden"
+                    style="margin-top: 25px; border-top: 1px solid var(--border); padding-top: 25px;">
+                    <label>Submit Payment Proof</label>
+                    <input type="file" id="slip-upload-input" accept="image/*">
+                    <button class="btn" id="upload-btn" style="margin-top: 15px;" onclick="uploadPayment()">Upload
+                        Slip</button>
+                </div>
+                <button class="btn btn-ghost" onclick="logout()">Sign Out</button>
+            </div>
+        </section>
+
+        <!-- ADMIN DASHBOARD -->
+        <section id="admin-dashboard-view" class="hidden">
+            <div class="card">
+                <h3 style="font-size: 0.9rem; text-align: center; text-transform: uppercase;">Cloud Summary</h3>
+                <div id="admin-stats-summary" class="summary-grid"></div>
+                <div style="border-top: 1px solid var(--border); padding-top: 20px;">
+                    <label>Verification Queue</label>
+                    <div id="admin-queue-list"></div>
+                </div>
+                <div style="border-top: 1px solid var(--border); margin-top: 25px; padding-top: 20px;">
+                    <label>All Members</label>
+                    <div id="admin-all-list" style="max-height: 250px; overflow-y: auto;"></div>
+                </div>
+                <button class="btn btn-ghost" onclick="logout()">Admin Logout</button>
+            </div>
+        </section>
+    </div>
+
     <script>
-        /* ---------------- FIREBASE ---------------- */
-        firebase.initializeApp({
+        // --- 1. FIREBASE CONFIGURATION ---
+        // PASTE YOUR CONFIG FROM FIREBASE CONSOLE HERE:
+        const firebaseConfig = {
             apiKey: "AIzaSyAcQi6LBvfe4ZYd5zPSWl8Oo0w5qB750kY",
             authDomain: "get-tickets-1.firebaseapp.com",
-            projectId: "get-tickets-1"
-        });
+            projectId: "get-tickets-1",
+            storageBucket: "get-tickets-1.firebasestorage.app",
+            messagingSenderId: "573509504264",
+            appId: "1:573509504264:web:62dab7e83ebd6f836e70bd",
+            measurementId: "G-TH1LN8W1DZ"
+        };
 
+        // Initialize Firebase
+        firebase.initializeApp(firebaseConfig);
         const db = firebase.firestore();
-        const ADMIN_PASS = "admin777";
+        const MASTER_PASS = "admin777";
 
-        let currentMember = null;
+        // --- 2. STATE & ROUTING ---
+        let currentView = 'entry';
+        let currentMemberDoc = null;
 
-        /* ---------------- MEMBER ---------------- */
+        function toast(msg) {
+            const t = document.getElementById('toast');
+            t.innerText = msg; t.style.display = 'block';
+            setTimeout(() => t.style.display = 'none', 2000);
+        }
 
+        function switchView(viewName) {
+            const views = ['entry', 'admin-login', 'member-portal', 'admin-dashboard'];
+            views.forEach(v => document.getElementById(`${v}-view`).classList.add('hidden'));
+            document.getElementById(`${viewName}-view`).classList.remove('hidden');
+            if (viewName === 'admin-dashboard') startAdminListener();
+        }
+
+        // --- 3. MEMBER LOGIC ---
         async function memberAccess() {
-            const name = nameInput.value.trim();
-            if (!name) return;
+            const name = document.getElementById('member-name-input').value.trim();
+            if (!name) return toast("Name is required");
 
-            const ref = db.collection("members").doc(name.toLowerCase());
-            const doc = await ref.get();
+            const memberRef = db.collection("members").doc(name.toLowerCase());
+            const doc = await memberRef.get();
 
             if (!doc.exists) {
-                await ref.set({
-                    name,
-                    ticketID: "T-" + Math.floor(1000 + Math.random() * 9000),
-                    status: "unpaid",
+                const newMember = {
+                    name: name,
+                    status: 'unpaid',
+                    ticketID: 'T-' + Math.floor(1000 + Math.random() * 8999),
                     slip: null,
-                    downloaded: false,
                     createdAt: firebase.firestore.FieldValue.serverTimestamp()
-                });
+                };
+                await memberRef.set(newMember);
+                currentMemberDoc = newMember;
+            } else {
+                currentMemberDoc = doc.data();
             }
 
-            ref.onSnapshot(snap => {
-                currentMember = snap.data();
-                renderMember();
-            });
+            renderMemberUI();
+            switchView('member-portal');
 
-            entry.classList.add("hidden");
-            member.classList.remove("hidden");
+            // Listen for real-time updates (if admin approves while user is looking)
+            memberRef.onSnapshot((snapshot) => {
+                if (snapshot.exists) {
+                    currentMemberDoc = snapshot.data();
+                    renderMemberUI();
+                }
+            });
         }
 
-        function renderMember() {
-            const u = currentMember;
-            const verified = u.status === "verified";
+        function renderMemberUI() {
+            const display = document.getElementById('member-ticket-display');
+            const upload = document.getElementById('upload-zone');
+            const u = currentMemberDoc;
+            const isOk = u.status === 'verified';
+            const isWaiting = u.status === 'waiting';
 
-            ticketBox.innerHTML = `
-                <div class="ticket">
-                    <div class="badge ${verified ? "ok" : "wait"}">${u.status}</div>
-                    <h2>${u.ticketID}</h2>
-                    <p>${u.name}</p>
-                    <div id="qr"></div>
-                </div>
-                ${verified ? `<button onclick="downloadTicket()">Download Ticket</button>` : ""}
-            `;
+            display.innerHTML = `
+            <div class="ticket">
+                <span class="badge ${isOk ? 'badge-ok' : 'badge-wait'}">
+                    ${isOk ? 'Verified' : (isWaiting ? 'Awaiting Review' : 'Payment Needed')}
+                </span>
+                <span class="ticket-no">${u.ticketID}</span>
+                <p style="font-weight:700; font-size:1.1rem; margin:0;">${u.name}</p>
+            </div>
+            ${isOk ? '<button class="btn" onclick="toast(\'Ticket ready for entry!\')">Download Ticket</button>' : ''}
+        `;
 
-            new QRCode(document.getElementById("qr"), {
-                text: `TICKET:${u.ticketID}|${u.name}`,
-                width: 120,
-                height: 120
-            });
-
-            if (verified && !u.downloaded) {
-                downloadTicket();
-                db.collection("members").doc(u.name.toLowerCase()).update({ downloaded: true });
-            }
+            if (u.status === 'unpaid') upload.classList.remove('hidden');
+            else if (isWaiting) {
+                upload.innerHTML = `<p style="font-size:0.8rem; color:var(--secondary); text-align:center;">Admin is verifying your slip...</p>`;
+                upload.classList.remove('hidden');
+            } else upload.classList.add('hidden');
         }
 
-        function uploadSlip() {
-            const file = slipInput.files[0];
-            if (!file) return;
+        function uploadPayment() {
+            const file = document.getElementById('slip-upload-input').files[0];
+            if (!file) return toast("Please select an image");
 
-            const r = new FileReader();
-            r.onload = () => {
-                db.collection("members").doc(currentMember.name.toLowerCase()).update({
-                    slip: r.result,
-                    status: "waiting"
+            const btn = document.getElementById('upload-btn');
+            btn.innerText = "Uploading...";
+            btn.disabled = true;
+
+            const reader = new FileReader();
+            reader.onload = async (e) => {
+                await db.collection("members").doc(currentMemberDoc.name.toLowerCase()).update({
+                    status: 'waiting',
+                    slip: e.target.result // Base64
                 });
+                toast("Payment slip uploaded!");
+                btn.innerText = "Upload Slip";
+                btn.disabled = false;
             };
-            r.readAsDataURL(file);
+            reader.readAsDataURL(file);
         }
 
-        function downloadTicket() {
-            const u = currentMember;
-            const w = window.open("");
-            w.document.write(`
-                <h2>${u.ticketID}</h2>
-                <p>${u.name}</p>
-                <div id="qr"></div>
-                <script src="https://cdn.jsdelivr.net/npm/qrcodejs/qrcode.min.js"><\/script>
-                <script>
-                    new QRCode(document.getElementById("qr"), {
-                        text: "TICKET:${u.ticketID}|${u.name}",
-                        width: 150,
-                        height: 150
-                    });
-                    setTimeout(()=>window.print(),500);
-                <\/script>
-            `);
-        }
-
-        /* ---------------- ADMIN ---------------- */
-
-        function showAdmin() {
-            entry.classList.add("hidden");
-            admin.classList.remove("hidden");
-        }
-
+        // --- 4. ADMIN LOGIC ---
         function adminLogin() {
-            if (adminPass.value !== ADMIN_PASS) return alert("Wrong password");
-            admin.classList.add("hidden");
-            dashboard.classList.remove("hidden");
-            loadAdmin();
+            if (document.getElementById('admin-pass-input').value === MASTER_PASS) {
+                switchView('admin-dashboard');
+            } else toast("Incorrect Password");
         }
 
-        function loadAdmin() {
-            db.collection("members").orderBy("createdAt", "desc").onSnapshot(snap => {
-                adminList.innerHTML = "";
-                snap.forEach(doc => {
-                    const u = doc.data();
-                    adminList.innerHTML += `
-                        <div class="admin-item">
-                            <b>${u.name}</b> (${u.status})
-                            <br/>
-                            <button onclick="viewSlip('${doc.id}')">Slip</button>
-                            <button onclick="verify('${doc.id}')">Verify</button>
-                            <button onclick="reject('${doc.id}')">Reject</button>
-                            <button onclick="deleteMember('${doc.id}')">Delete</button>
-                        </div>
-                    `;
-                });
+        function startAdminListener() {
+            db.collection("members").orderBy("createdAt", "desc").onSnapshot((snapshot) => {
+                const users = [];
+                snapshot.forEach(doc => users.push({ id: doc.id, ...doc.data() }));
+                renderAdminUI(users);
             });
         }
 
-        function verify(id) {
-            db.collection("members").doc(id).update({ status: "verified" });
+        function renderAdminUI(users) {
+            const stats = document.getElementById('admin-stats-summary');
+            const queue = document.getElementById('admin-queue-list');
+            const all = document.getElementById('admin-all-list');
+
+            const waiting = users.filter(u => u.status === 'waiting');
+            const verified = users.filter(u => u.status === 'verified').length;
+
+            stats.innerHTML = `
+            <div class="summary-card"><span class="summary-val">${users.length}</span><span class="summary-lab">Members</span></div>
+            <div class="summary-card"><span class="summary-val" style="color:var(--warning)">${waiting.length}</span><span class="summary-lab">Queued</span></div>
+            <div class="summary-card"><span class="summary-val" style="color:var(--success)">${verified}</span><span class="summary-lab">Verified</span></div>
+            <div class="summary-card"><span class="summary-val" style="color:var(--secondary)">${users.length - verified - waiting.length}</span><span class="summary-lab">Unpaid</span></div>
+        `;
+
+            queue.innerHTML = waiting.length ? '' : '<p style="font-size:0.75rem; color:var(--muted); text-align:center;">Empty</p>';
+            waiting.forEach(u => {
+                const div = document.createElement('div');
+                div.className = 'list-item';
+                div.innerHTML = `
+                <div style="font-size:0.85rem; font-weight:600;">${u.name}</div>
+                <div style="display:flex; gap:8px;">
+                    <button class="btn btn-sm btn-ghost" onclick="viewSlip('${u.id}')">Slip</button>
+                    <button class="btn btn-sm" onclick="approve('${u.id}')">Verify</button>
+                </div>
+            `;
+                queue.appendChild(div);
+            });
+
+            all.innerHTML = '';
+            users.forEach(u => {
+                const div = document.createElement('div');
+                div.className = 'list-item';
+                div.innerHTML = `
+                <div style="font-size:0.8rem;">${u.name} <small style="color:var(--muted)">(${u.status})</small></div>
+                <button class="btn btn-sm btn-ghost" onclick="viewCopy('${u.id}')">View</button>
+            `;
+                all.appendChild(div);
+            });
         }
 
-        function reject(id) {
-            db.collection("members").doc(id).update({ status: "unpaid", slip: null });
+        async function approve(id) {
+            await db.collection("members").doc(id).update({ status: 'verified' });
+            toast("Verified!");
         }
 
         async function viewSlip(id) {
-            const d = await db.collection("members").doc(id).get();
-            window.open(d.data().slip);
+            const doc = await db.collection("members").doc(id).get();
+            const u = doc.data();
+            openModal(`Slip: ${u.name}`, `<img src="${u.slip}" class="preview-img">`);
         }
 
-        function deleteMember(id) {
-            if (confirm("Delete member?"))
-                db.collection("members").doc(id).delete();
+        async function viewCopy(id) {
+            const doc = await db.collection("members").doc(id).get();
+            const u = doc.data();
+            const isOk = u.status === 'verified';
+            openModal(`Ticket Copy`, `<div class="ticket"><span class="badge ${isOk ? 'badge-ok' : 'badge-wait'}">${u.status}</span><span class="ticket-no">${u.ticketID}</span><p>${u.name}</p></div>`);
         }
 
-        function logout() {
-            location.reload();
+        function closeModal() { document.getElementById('modal').style.display = 'none'; }
+        function openModal(title, body) {
+            document.getElementById('modal-title').innerText = title;
+            document.getElementById('modal-body').innerHTML = body;
+            document.getElementById('modal').style.display = 'flex';
         }
+
+        function logout() { location.reload(); }
     </script>
 </body>
 
