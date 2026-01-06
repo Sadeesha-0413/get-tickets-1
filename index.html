@@ -283,7 +283,7 @@
 
     <nav>
         <div class="logo">TICKET HUB</div>
-        <div id="view-tag" class="view-indicator">ID Verification Active</div>
+        <div id="view-tag" class="view-indicator">2026-GET</div>
     </nav>
 
     <div class="container">
@@ -331,7 +331,7 @@
                 <h3 style="color: var(--primary); text-align: center;">Gate Check-In</h3>
                 <div class="form-group">
                     <label>Verify Ticket ID</label>
-                    <input type="text" id="id-verify-input" placeholder="e.g. ID-12345" style="text-align: center; text-transform: uppercase;">
+                    <input type="text" id="id-verify-input" placeholder="e.g. T12345" style="text-align: center; text-transform: uppercase;">
                 </div>
                 <button class="btn" onclick="validateTicketID()">Check-In Ticket</button>
             </div>
@@ -430,7 +430,7 @@
                     const newMember = {
                         name: name,
                         status: 'unpaid',
-                        ticketID: 'ID-' + Math.floor(10000 + Math.random() * 89999),
+                        ticketID: 'T' + Math.floor(10000 + Math.random() * 89999),
                         slip: null,
                         checkedIn: false,
                         createdAt: firebase.firestore.FieldValue.serverTimestamp()
