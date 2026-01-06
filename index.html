@@ -23,6 +23,7 @@
             --success-bg: #ecfdf5;
             --warning: #f59e0b;
             --warning-bg: #fffbeb;
+            --danger: #ef4444;
             --border: #e2e8f0;
             --radius: 16px;
             --shadow: 0 10px 25px -5px rgba(37, 99, 235, 0.1);
@@ -164,6 +165,15 @@
 
         .btn-success { background: var(--success); }
         .btn-success:hover { background: #059669; }
+
+        .btn-danger-ghost {
+            background: transparent;
+            color: var(--danger);
+        }
+
+        .btn-danger-ghost:hover {
+            background: #fef2f2;
+        }
 
         .ticket {
             text-align: center;
@@ -560,6 +570,7 @@
                     <div style="display:flex; gap:6px;">
                         <button class="btn btn-sm btn-ghost" onclick="viewSlip('${u.id}')">Proof</button>
                         <button class="btn btn-sm" onclick="approve('${u.id}')">Verify</button>
+                        <button class="btn btn-sm btn-danger-ghost" onclick="reject('${u.id}')">Reject</button>
                     </div>
                 `;
                 queue.appendChild(div);
@@ -571,10 +582,11 @@
                 div.className = 'list-item';
                 div.innerHTML = `
                     <div style="font-size:0.8rem;">${u.name} <small style="color:var(--muted)">(${u.ticketID})</small></div>
-                    <div style="display:flex; gap:4px;">
+                    <div style="display:flex; gap:4px; flex-wrap: wrap; justify-content: flex-end;">
                         <button class="btn btn-sm btn-ghost" onclick="viewSlip('${u.id}')">Slip</button>
                         <button class="btn btn-sm btn-ghost" onclick="viewCopy('${u.id}')">View</button>
                         <button class="btn btn-sm btn-success" onclick="downloadTicketFromId('${u.id}')">PNG</button>
+                        <button class="btn btn-sm btn-danger-ghost" onclick="reject('${u.id}')">Reject</button>
                     </div>
                 `;
                 all.appendChild(div);
@@ -584,6 +596,15 @@
         async function approve(id) {
             await getCollection().doc(id).update({ status: 'verified' });
             toast("Verified!");
+        }
+
+        async function reject(id) {
+            // No custom modal/confirm needed, direct update
+            await getCollection().doc(id).update({
+                status: 'unpaid',
+                slip: null
+            });
+            toast("Slip rejected. Member can re-upload.");
         }
 
         async function viewSlip(id) {
