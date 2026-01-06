@@ -6,9 +6,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Ticket Hub - Cloud Edition</title>
     <!-- Firebase SDKs -->
-    <script src="https://www.gstatic.com/firebasejs/11.0.2/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/11.0.2/firebase-firestore-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/11.0.2/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
 
     <style>
         :root {
@@ -30,7 +30,7 @@
 
         * {
             box-sizing: border-box;
-            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            font-family: 'Inter', sans-serif;
             -webkit-font-smoothing: antialiased;
         }
 
@@ -68,14 +68,22 @@
             padding: 4px 10px;
             border-radius: 20px;
             text-transform: uppercase;
+        }
+
+        .view-member {
             background: var(--bg);
             color: var(--secondary);
+        }
+
+        .view-admin {
+            background: #1e293b;
+            color: #fff;
         }
 
         .container {
             width: 100%;
             max-width: 480px;
-            margin: 20px auto;
+            margin: 40px auto;
             padding: 0 20px;
             flex: 1;
         }
@@ -88,7 +96,8 @@
             box-shadow: var(--shadow);
         }
 
-        h2, h3 {
+        h2,
+        h3 {
             margin: 0 0 15px;
             color: var(--text);
         }
@@ -113,7 +122,6 @@
             border-radius: 12px;
             font-size: 1rem;
             outline: none;
-            transition: 0.2s;
         }
 
         input:focus {
@@ -138,14 +146,9 @@
             gap: 8px;
         }
 
-        .btn:hover:not(:disabled) {
+        .btn:hover {
             background: var(--primary-dark);
             transform: translateY(-1px);
-        }
-
-        .btn:disabled {
-            opacity: 0.6;
-            cursor: not-allowed;
         }
 
         .btn-ghost {
@@ -157,13 +160,10 @@
         }
 
         .btn-sm {
-            padding: 8px 12px;
-            font-size: 0.7rem;
+            padding: 8px 14px;
+            font-size: 0.75rem;
             width: auto;
         }
-
-        .btn-success { background: var(--success); }
-        .btn-success:hover { background: #059669; }
 
         .ticket {
             text-align: center;
@@ -172,7 +172,6 @@
             border: 2px dashed var(--primary);
             background: #fff;
             margin-bottom: 20px;
-            position: relative;
         }
 
         .ticket-no {
@@ -191,8 +190,15 @@
             text-transform: uppercase;
         }
 
-        .badge-wait { background: var(--warning-bg); color: var(--warning); }
-        .badge-ok { background: var(--success-bg); color: var(--success); }
+        .badge-wait {
+            background: var(--warning-bg);
+            color: var(--warning);
+        }
+
+        .badge-ok {
+            background: var(--success-bg);
+            color: var(--success);
+        }
 
         .summary-grid {
             display: grid;
@@ -251,10 +257,8 @@
             padding: 30px;
             border-radius: 20px;
             width: 100%;
-            max-width: 420px;
+            max-width: 400px;
             text-align: center;
-            max-height: 90vh;
-            overflow-y: auto;
         }
 
         .preview-img {
@@ -262,10 +266,11 @@
             border-radius: 12px;
             margin: 15px 0;
             border: 1px solid var(--border);
-            display: block;
         }
 
-        .hidden { display: none !important; }
+        .hidden {
+            display: none;
+        }
 
         #toast {
             position: fixed;
@@ -281,10 +286,6 @@
             z-index: 3000;
             box-shadow: 0 10px 15px rgba(0, 0, 0, 0.1);
         }
-
-        #ticket-canvas {
-            display: none;
-        }
     </style>
 </head>
 
@@ -296,29 +297,26 @@
         <div class="modal-content" onclick="event.stopPropagation()">
             <h3 id="modal-title"></h3>
             <div id="modal-body"></div>
-            <div id="modal-footer" style="margin-top: 20px;">
-                <button class="btn btn-ghost" onclick="closeModal()">Close</button>
-            </div>
+            <button class="btn btn-ghost" onclick="closeModal()">Close</button>
         </div>
     </div>
 
-    <canvas id="ticket-canvas" width="400" height="250"></canvas>
-
     <nav>
         <div class="logo">TICKET HUB</div>
-        <div id="view-tag" class="view-indicator">Cloud Sync Active</div>
+        <div id="view-tag" class="view-indicator">Cloud Connected</div>
     </nav>
 
     <div class="container">
         <!-- ENTRY VIEW -->
         <section id="entry-view" class="card">
             <h2>Welcome</h2>
-            <p style="color:var(--secondary); font-size:0.9rem; margin-bottom:25px;">Enter your name to access your ticket.</p>
+            <p style="color:var(--secondary); font-size:0.9rem; margin-bottom:25px;">Enter your name to access your
+                ticket.</p>
             <div class="form-group">
                 <label>Full Name</label>
                 <input type="text" id="member-name-input" placeholder="e.g. John Doe">
             </div>
-            <button class="btn" id="access-btn" onclick="memberAccess()">View Ticket</button>
+            <button class="btn" onclick="memberAccess()">View Ticket</button>
             <button class="btn btn-ghost" onclick="switchView('admin-login')">Admin Panel</button>
         </section>
 
@@ -326,7 +324,7 @@
         <section id="admin-login-view" class="card hidden">
             <h2>Admin Login</h2>
             <div class="form-group">
-                <label>Access Password</label>
+                <label>Password</label>
                 <input type="password" id="admin-pass-input" placeholder="••••••••">
             </div>
             <button class="btn" onclick="adminLogin()">Login</button>
@@ -337,10 +335,12 @@
         <section id="member-portal-view" class="hidden">
             <div class="card">
                 <div id="member-ticket-display"></div>
-                <div id="upload-zone" class="hidden" style="margin-top: 25px; border-top: 1px solid var(--border); padding-top: 25px;">
+                <div id="upload-zone" class="hidden"
+                    style="margin-top: 25px; border-top: 1px solid var(--border); padding-top: 25px;">
                     <label>Submit Payment Proof</label>
-                    <input type="file" id="slip-upload-input" accept="image/*" style="font-size: 0.8rem;">
-                    <button class="btn" id="upload-btn" style="margin-top: 15px;" onclick="uploadPayment()">Upload Slip</button>
+                    <input type="file" id="slip-upload-input" accept="image/*">
+                    <button class="btn" id="upload-btn" style="margin-top: 15px;" onclick="uploadPayment()">Upload
+                        Slip</button>
                 </div>
                 <button class="btn btn-ghost" onclick="logout()">Sign Out</button>
             </div>
@@ -349,60 +349,47 @@
         <!-- ADMIN DASHBOARD -->
         <section id="admin-dashboard-view" class="hidden">
             <div class="card">
-                <h3 style="font-size: 0.9rem; text-align: center; text-transform: uppercase; margin-bottom: 20px;">System Dashboard</h3>
+                <h3 style="font-size: 0.9rem; text-align: center; text-transform: uppercase;">Cloud Summary</h3>
                 <div id="admin-stats-summary" class="summary-grid"></div>
-                
                 <div style="border-top: 1px solid var(--border); padding-top: 20px;">
                     <label>Verification Queue</label>
                     <div id="admin-queue-list"></div>
                 </div>
-
                 <div style="border-top: 1px solid var(--border); margin-top: 25px; padding-top: 20px;">
-                    <label>Verified Members</label>
+                    <label>All Members</label>
                     <div id="admin-all-list" style="max-height: 250px; overflow-y: auto;"></div>
                 </div>
-
                 <button class="btn btn-ghost" onclick="logout()">Admin Logout</button>
             </div>
         </section>
     </div>
 
     <script>
-        // --- 1. CONFIGURATION & INIT ---
-        const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-ticket-hub';
-        const firebaseConfig = typeof __firebase_config !== 'undefined' 
-            ? JSON.parse(__firebase_config) 
-            : { /* Fallback for local testing */ };
+        // --- 1. FIREBASE CONFIGURATION ---
+        // PASTE YOUR CONFIG FROM FIREBASE CONSOLE HERE:
+        const firebaseConfig = {
+            apiKey: "AIzaSyAcQi6LBvfe4ZYd5zPSWl8Oo0w5qB750kY",
+            authDomain: "get-tickets-1.firebaseapp.com",
+            projectId: "get-tickets-1",
+            storageBucket: "get-tickets-1.firebasestorage.app",
+            messagingSenderId: "573509504264",
+            appId: "1:573509504264:web:62dab7e83ebd6f836e70bd",
+            measurementId: "G-TH1LN8W1DZ"
+        };
 
+        // Initialize Firebase
         firebase.initializeApp(firebaseConfig);
         const db = firebase.firestore();
-        const auth = firebase.auth();
         const MASTER_PASS = "admin777";
 
-        const getCollection = () => db.collection('artifacts').doc(appId).collection('public').doc('data').collection('members');
-
+        // --- 2. STATE & ROUTING ---
+        let currentView = 'entry';
         let currentMemberDoc = null;
-        let authInitialized = false;
-
-        async function initAuth() {
-            if (authInitialized) return;
-            try {
-                if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
-                    await auth.signInWithCustomToken(__initial_auth_token);
-                } else {
-                    await auth.signInAnonymously();
-                }
-                authInitialized = true;
-            } catch (e) {
-                console.error("Auth error:", e);
-                toast("Connection failed");
-            }
-        }
 
         function toast(msg) {
             const t = document.getElementById('toast');
             t.innerText = msg; t.style.display = 'block';
-            setTimeout(() => t.style.display = 'none', 3000);
+            setTimeout(() => t.style.display = 'none', 2000);
         }
 
         function switchView(viewName) {
@@ -412,53 +399,38 @@
             if (viewName === 'admin-dashboard') startAdminListener();
         }
 
-        // --- 2. MEMBER PORTAL ---
+        // --- 3. MEMBER LOGIC ---
         async function memberAccess() {
             const name = document.getElementById('member-name-input').value.trim();
-            if (!name) return toast("Please enter your name");
+            if (!name) return toast("Name is required");
 
-            const btn = document.getElementById('access-btn');
-            btn.disabled = true;
-            btn.innerText = "Checking...";
+            const memberRef = db.collection("members").doc(name.toLowerCase());
+            const doc = await memberRef.get();
 
-            await initAuth();
-            if (!auth.currentUser) return btn.disabled = false;
-
-            const docId = name.toLowerCase().replace(/\s+/g, '_');
-            const memberRef = getCollection().doc(docId);
-            
-            try {
-                const doc = await memberRef.get();
-                if (!doc.exists) {
-                    const newMember = {
-                        name: name,
-                        status: 'unpaid',
-                        ticketID: 'T-' + Math.floor(1000 + Math.random() * 8999),
-                        slip: null,
-                        createdAt: firebase.firestore.FieldValue.serverTimestamp()
-                    };
-                    await memberRef.set(newMember);
-                    currentMemberDoc = newMember;
-                } else {
-                    currentMemberDoc = doc.data();
-                }
-
-                renderMemberUI();
-                switchView('member-portal');
-
-                memberRef.onSnapshot((snapshot) => {
-                    if (snapshot.exists) {
-                        currentMemberDoc = snapshot.data();
-                        renderMemberUI();
-                    }
-                }, (err) => console.error(err));
-
-            } catch (e) {
-                toast("Error accessing portal");
-            } finally {
-                btn.disabled = false;
-                btn.innerText = "View Ticket";
+            if (!doc.exists) {
+                const newMember = {
+                    name: name,
+                    status: 'unpaid',
+                    ticketID: 'T-' + Math.floor(1000 + Math.random() * 8999),
+                    slip: null,
+                    createdAt: firebase.firestore.FieldValue.serverTimestamp()
+                };
+                await memberRef.set(newMember);
+                currentMemberDoc = newMember;
+            } else {
+                currentMemberDoc = doc.data();
             }
+
+            renderMemberUI();
+            switchView('member-portal');
+
+            // Listen for real-time updates (if admin approves while user is looking)
+            memberRef.onSnapshot((snapshot) => {
+                if (snapshot.exists) {
+                    currentMemberDoc = snapshot.data();
+                    renderMemberUI();
+                }
+            });
         }
 
         function renderMemberUI() {
@@ -469,61 +441,57 @@
             const isWaiting = u.status === 'waiting';
 
             display.innerHTML = `
-                <div class="ticket">
-                    <span class="badge ${isOk ? 'badge-ok' : 'badge-wait'}">
-                        ${isOk ? 'Verified' : (isWaiting ? 'Awaiting Review' : 'Payment Needed')}
-                    </span>
-                    <span class="ticket-no">${u.ticketID}</span>
-                    <p style="font-weight:700; font-size:1.1rem; margin:0;">${u.name}</p>
-                </div>
-                ${isOk ? `<button class="btn btn-success" onclick="downloadTicketFromData()">Download My Ticket</button>` : ''}
-            `;
+            <div class="ticket">
+                <span class="badge ${isOk ? 'badge-ok' : 'badge-wait'}">
+                    ${isOk ? 'Verified' : (isWaiting ? 'Awaiting Review' : 'Payment Needed')}
+                </span>
+                <span class="ticket-no">${u.ticketID}</span>
+                <p style="font-weight:700; font-size:1.1rem; margin:0;">${u.name}</p>
+            </div>
+            ${isOk ? '<button class="btn" onclick="toast(\'Ticket ready for entry!\')">Download Ticket</button>' : ''}
+        `;
 
             if (u.status === 'unpaid') upload.classList.remove('hidden');
             else if (isWaiting) {
-                upload.innerHTML = `<p style="font-size:0.8rem; color:var(--secondary); text-align:center;">Verifying payment slip...</p>`;
+                upload.innerHTML = `<p style="font-size:0.8rem; color:var(--secondary); text-align:center;">Admin is verifying your slip...</p>`;
                 upload.classList.remove('hidden');
             } else upload.classList.add('hidden');
         }
 
         function uploadPayment() {
             const file = document.getElementById('slip-upload-input').files[0];
-            if (!file) return toast("Select a file");
+            if (!file) return toast("Please select an image");
 
             const btn = document.getElementById('upload-btn');
-            btn.innerText = "Processing...";
+            btn.innerText = "Uploading...";
             btn.disabled = true;
 
             const reader = new FileReader();
             reader.onload = async (e) => {
-                const docId = currentMemberDoc.name.toLowerCase().replace(/\s+/g, '_');
-                await getCollection().doc(docId).update({
+                await db.collection("members").doc(currentMemberDoc.name.toLowerCase()).update({
                     status: 'waiting',
-                    slip: e.target.result
+                    slip: e.target.result // Base64
                 });
-                toast("Slip submitted!");
+                toast("Payment slip uploaded!");
                 btn.innerText = "Upload Slip";
                 btn.disabled = false;
             };
             reader.readAsDataURL(file);
         }
 
-        // --- 3. ADMIN PORTAL ---
+        // --- 4. ADMIN LOGIC ---
         function adminLogin() {
             if (document.getElementById('admin-pass-input').value === MASTER_PASS) {
-                initAuth().then(() => switchView('admin-dashboard'));
+                switchView('admin-dashboard');
             } else toast("Incorrect Password");
         }
 
-        let adminUnsubscribe = null;
         function startAdminListener() {
-            if (adminUnsubscribe) adminUnsubscribe();
-            adminUnsubscribe = getCollection().onSnapshot((snapshot) => {
+            db.collection("members").orderBy("createdAt", "desc").onSnapshot((snapshot) => {
                 const users = [];
                 snapshot.forEach(doc => users.push({ id: doc.id, ...doc.data() }));
-                users.sort((a, b) => (b.createdAt?.seconds || 0) - (a.createdAt?.seconds || 0));
                 renderAdminUI(users);
-            }, (err) => toast("Access denied"));
+            });
         }
 
         function renderAdminUI(users) {
@@ -532,117 +500,67 @@
             const all = document.getElementById('admin-all-list');
 
             const waiting = users.filter(u => u.status === 'waiting');
-            const verified = users.filter(u => u.status === 'verified');
-            const unpaid = users.filter(u => u.status === 'unpaid');
+            const verified = users.filter(u => u.status === 'verified').length;
 
             stats.innerHTML = `
-                <div class="summary-card"><span class="summary-val">${users.length}</span><span class="summary-lab">Total</span></div>
-                <div class="summary-card"><span class="summary-val" style="color:var(--warning)">${waiting.length}</span><span class="summary-lab">Queued</span></div>
-                <div class="summary-card"><span class="summary-val" style="color:var(--success)">${verified.length}</span><span class="summary-lab">Verified</span></div>
-                <div class="summary-card"><span class="summary-val" style="color:var(--secondary)">${unpaid.length}</span><span class="summary-lab">Unpaid</span></div>
-            `;
+            <div class="summary-card"><span class="summary-val">${users.length}</span><span class="summary-lab">Members</span></div>
+            <div class="summary-card"><span class="summary-val" style="color:var(--warning)">${waiting.length}</span><span class="summary-lab">Queued</span></div>
+            <div class="summary-card"><span class="summary-val" style="color:var(--success)">${verified}</span><span class="summary-lab">Verified</span></div>
+            <div class="summary-card"><span class="summary-val" style="color:var(--secondary)">${users.length - verified - waiting.length}</span><span class="summary-lab">Unpaid</span></div>
+        `;
 
-            queue.innerHTML = waiting.length ? '' : '<p style="font-size:0.75rem; color:var(--muted); text-align:center; padding: 10px;">Queue empty</p>';
+            queue.innerHTML = waiting.length ? '' : '<p style="font-size:0.75rem; color:var(--muted); text-align:center;">Empty</p>';
             waiting.forEach(u => {
                 const div = document.createElement('div');
                 div.className = 'list-item';
                 div.innerHTML = `
-                    <div style="font-size:0.8rem; font-weight:600;">${u.name}</div>
-                    <div style="display:flex; gap:6px;">
-                        <button class="btn btn-sm btn-ghost" onclick="viewSlip('${u.id}')">Proof</button>
-                        <button class="btn btn-sm" onclick="approve('${u.id}')">Verify</button>
-                    </div>
-                `;
+                <div style="font-size:0.85rem; font-weight:600;">${u.name}</div>
+                <div style="display:flex; gap:8px;">
+                    <button class="btn btn-sm btn-ghost" onclick="viewSlip('${u.id}')">Slip</button>
+                    <button class="btn btn-sm" onclick="approve('${u.id}')">Verify</button>
+                </div>
+            `;
                 queue.appendChild(div);
             });
 
-            all.innerHTML = verified.length ? '' : '<p style="font-size:0.75rem; color:var(--muted); text-align:center; padding: 10px;">No members</p>';
-            verified.forEach(u => {
+            all.innerHTML = '';
+            users.forEach(u => {
                 const div = document.createElement('div');
                 div.className = 'list-item';
                 div.innerHTML = `
-                    <div style="font-size:0.8rem;">${u.name} <small style="color:var(--muted)">(${u.ticketID})</small></div>
-                    <div style="display:flex; gap:4px;">
-                        <button class="btn btn-sm btn-ghost" onclick="viewSlip('${u.id}')">Slip</button>
-                        <button class="btn btn-sm btn-ghost" onclick="viewCopy('${u.id}')">View</button>
-                        <button class="btn btn-sm btn-success" onclick="downloadTicketFromId('${u.id}')">PNG</button>
-                    </div>
-                `;
+                <div style="font-size:0.8rem;">${u.name} <small style="color:var(--muted)">(${u.status})</small></div>
+                <button class="btn btn-sm btn-ghost" onclick="viewCopy('${u.id}')">View</button>
+            `;
                 all.appendChild(div);
             });
         }
 
         async function approve(id) {
-            await getCollection().doc(id).update({ status: 'verified' });
+            await db.collection("members").doc(id).update({ status: 'verified' });
             toast("Verified!");
         }
 
         async function viewSlip(id) {
-            const doc = await getCollection().doc(id).get();
+            const doc = await db.collection("members").doc(id).get();
             const u = doc.data();
-            if (!u.slip) return toast("No slip found");
             openModal(`Slip: ${u.name}`, `<img src="${u.slip}" class="preview-img">`);
         }
 
         async function viewCopy(id) {
-            const doc = await getCollection().doc(id).get();
+            const doc = await db.collection("members").doc(id).get();
             const u = doc.data();
-            const content = `
-                <div class="ticket">
-                    <span class="badge badge-ok">Verified</span>
-                    <span class="ticket-no">${u.ticketID}</span>
-                    <p style="font-weight:700;">${u.name}</p>
-                </div>
-                <p style="font-size: 0.75rem; color: var(--muted);">Admin Preview Mode</p>
-            `;
-            openModal(`Ticket Preview`, content);
+            const isOk = u.status === 'verified';
+            openModal(`Ticket Copy`, `<div class="ticket"><span class="badge ${isOk ? 'badge-ok' : 'badge-wait'}">${u.status}</span><span class="ticket-no">${u.ticketID}</span><p>${u.name}</p></div>`);
         }
 
-        // --- 4. TICKET GEN ---
-        function downloadTicketFromData() { generateTicket(currentMemberDoc); }
-        async function downloadTicketFromId(id) {
-            const doc = await getCollection().doc(id).get();
-            generateTicket(doc.data());
-        }
-
-        function generateTicket(u) {
-            const canvas = document.getElementById('ticket-canvas');
-            const ctx = canvas.getContext('2d');
-            ctx.fillStyle = '#ffffff';
-            ctx.fillRect(0, 0, canvas.width, canvas.height);
-            ctx.strokeStyle = '#2563eb';
-            ctx.lineWidth = 4;
-            ctx.setLineDash([10, 5]);
-            ctx.strokeRect(10, 10, canvas.width - 20, canvas.height - 20);
-            ctx.setLineDash([]);
-            ctx.fillStyle = '#2563eb';
-            ctx.font = 'bold 18px Arial';
-            ctx.textAlign = 'left';
-            ctx.fillText('OFFICIAL TICKET HUB', 30, 45);
-            ctx.fillStyle = '#0f172a';
-            ctx.font = 'bold 50px Arial';
-            ctx.textAlign = 'center';
-            ctx.fillText(u.ticketID, canvas.width/2, 135);
-            ctx.font = 'bold 24px Arial';
-            ctx.fillText(u.name.toUpperCase(), canvas.width/2, 185);
-            ctx.fillStyle = '#64748b';
-            ctx.font = '12px Arial';
-            ctx.fillText('Cloud Verified - Valid for Single Entry', canvas.width/2, 225);
-            const link = document.createElement('a');
-            link.download = `Ticket_${u.name.replace(/\s+/g, '_')}.png`;
-            link.href = canvas.toDataURL('image/png');
-            link.click();
-            toast("Download started");
-        }
-
+        function closeModal() { document.getElementById('modal').style.display = 'none'; }
         function openModal(title, body) {
             document.getElementById('modal-title').innerText = title;
             document.getElementById('modal-body').innerHTML = body;
             document.getElementById('modal').style.display = 'flex';
         }
-        function closeModal() { document.getElementById('modal').style.display = 'none'; }
+
         function logout() { location.reload(); }
-        window.onload = initAuth;
     </script>
 </body>
 
