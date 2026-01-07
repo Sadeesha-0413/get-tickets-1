@@ -289,7 +289,7 @@
     </div>
 
     <!-- Hidden canvas for PNG generation -->
-    <canvas id="ticket-canvas" width="600" height="450"></canvas>
+    <canvas id="ticket-canvas" width="600" height="480"></canvas>
 
     <nav>
         <div class="logo">TICKET HUB</div>
@@ -325,8 +325,8 @@
             <div class="card">
                 <div id="member-ticket-display"></div>
                 <div id="upload-zone" class="hidden" style="margin-top: 25px; border-top: 1px solid var(--border); padding-top: 25px;">
-                    <label>Upload Payment Proof</label>
-                    <p style="color: var(--secondary); font-size: 0.8rem; margin-bottom: 15px;">Please upload a screenshot of your transaction receipt.</p>
+                    <label>Upload Payment Proof (Rs. 5000.00)</label>
+                    <p style="color: var(--secondary); font-size: 0.8rem; margin-bottom: 15px;">Please upload a screenshot of your transaction receipt for the amount of Rs. 5000.00.</p>
                     <input type="file" id="slip-upload-input" accept="image/*" style="padding: 10px; border: 1px dashed var(--border); width: 100%; color: var(--secondary);">
                     <button class="btn" id="upload-btn" style="margin-top: 20px;" onclick="uploadPayment()">Submit Verification</button>
                 </div>
@@ -459,7 +459,6 @@
                         currentMemberDoc = snapshot.data();
                         renderMemberUI();
                     } else if (currentMemberDoc && currentMemberDoc.status !== 'verified') {
-                        // Deleted logic
                         const content = `
                             <div style="padding: 10px 0;">
                                 <p style="color: var(--secondary); margin-bottom: 20px; line-height: 1.6;">Your payment proof was not accepted. Please try again and upload slip again.</p>
@@ -496,9 +495,10 @@
                     </span>
                     <span class="ticket-no">${u.ticketID}</span>
                     <p style="font-weight:700; font-size:1.2rem; margin:0; color: white;">${u.name}</p>
-                    <p style="font-size: 0.85rem; color: var(--secondary); margin-top: 15px;">
+                    <p style="font-size: 0.85rem; color: var(--secondary); margin-top: 15px; line-height: 1.6;">
                         Venue: Ahaspokuna hotel<br>
-                        Time: 9.00 am to 4.00 pm
+                        Time: 9.00 am to 4.00 pm<br>
+                        <span style="color: var(--primary); font-weight: 800;">Price: Rs. 5000.00</span>
                     </p>
                 </div>
                 ${isOk ? `<button class="btn btn-success" onclick="downloadTicketFromData()">Download Digital Pass</button>` : ''}
@@ -681,8 +681,9 @@
             openModal(`Pass Preview`, `<div class="ticket">
                 <span class="badge badge-ok">${u.checkedIn ? 'CHECKED IN' : 'VALID'}</span>
                 <span class="ticket-no">${u.ticketID}</span>
-                <p style="color:white;">${u.name}</p>
-                <p style="font-size:0.75rem; color:var(--secondary); margin-top:10px;">Ahaspokuna hotel</p>
+                <p style="color:white; font-weight:700;">${u.name}</p>
+                <p style="font-size:0.75rem; color:var(--secondary); margin-top:10px; line-height:1.5;">Ahaspokuna hotel<br>
+                <span style="color: var(--primary); font-weight: 800;">Rs. 5000.00</span></p>
             </div>`);
         }
 
@@ -706,8 +707,12 @@
             ctx.fillStyle = '#f8fafc'; ctx.font = '18px Arial';
             ctx.fillText('Venue: Ahaspokuna hotel', canvas.width/2, 300);
             ctx.fillText('Time: 9.00 am to 4.00 pm', canvas.width/2, 330);
+            
+            // Price Tag
+            ctx.fillStyle = '#3b82f6'; ctx.font = 'bold 22px Arial';
+            ctx.fillText('TICKET PRICE: RS. 5000.00', canvas.width/2, 375);
 
-            ctx.fillStyle = '#64748b'; ctx.font = '14px Arial'; ctx.fillText('Valid for single entry. Verify Ticket ID at gate.', canvas.width/2, 400);
+            ctx.fillStyle = '#64748b'; ctx.font = '14px Arial'; ctx.fillText('Valid for single entry. Verify Ticket ID at gate.', canvas.width/2, 430);
             
             const link = document.createElement('a');
             link.download = `Pass_${u.name.replace(/\s+/g, '_')}.png`;
