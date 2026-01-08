@@ -167,13 +167,6 @@
             background: rgba(255,255,255,0.05);
         }
 
-        .btn-outline {
-            background: transparent;
-            color: var(--primary);
-            border: 1px solid var(--primary);
-            margin-top: 10px;
-        }
-
         .btn-sm { padding: 8px 12px; font-size: 0.75rem; width: auto; }
         .btn-success { background: var(--success); }
         .btn-danger-ghost { background: transparent; color: var(--danger); border: 1px solid rgba(239, 68, 68, 0.2); }
@@ -251,8 +244,8 @@
         }
 
         .preview-img {
-            max-width: 100%; border-radius: 15px; margin: 20px 0;
-            border: 1px solid var(--border); box-shadow: 0 20px 40px rgba(0,0,0,0.5);
+            max-width: 100%; border-radius: 15px; margin: 15px 0;
+            border: 1px solid var(--border); box-shadow: 0 10px 20px rgba(0,0,0,0.3);
         }
 
         .hidden { display: none !important; }
@@ -484,7 +477,7 @@
 
             const btn = document.getElementById('access-btn');
             btn.disabled = true;
-            btn.innerText = "Synchronizing...";
+            btn.innerText = "Connecting...";
 
             await initAuth();
             if (!auth.currentUser) return btn.disabled = false;
@@ -540,23 +533,13 @@
             const isWaiting = u.status === 'waiting' || u.status === 'waiting_balance';
             const isCheckedIn = u.checkedIn === true;
 
-            // Ticket Display logic
             let badgeClass = 'badge-wait';
             let statusText = 'Payment Required';
             
-            if (isCheckedIn) {
-                badgeClass = 'badge-ok';
-                statusText = 'Checked In';
-            } else if (isVerified) {
-                badgeClass = 'badge-ok';
-                statusText = 'Access Verified';
-            } else if (isAdvanceVerified) {
-                badgeClass = 'badge-half';
-                statusText = 'Partially Paid';
-            } else if (isWaiting) {
-                badgeClass = 'badge-wait';
-                statusText = 'Review Pending';
-            }
+            if (isCheckedIn) { badgeClass = 'badge-ok'; statusText = 'Checked In'; }
+            else if (isVerified) { badgeClass = 'badge-ok'; statusText = 'Access Verified'; }
+            else if (isAdvanceVerified) { badgeClass = 'badge-half'; statusText = 'Partially Paid'; }
+            else if (isWaiting) { badgeClass = 'badge-wait'; statusText = 'Review Pending'; }
 
             display.innerHTML = `
                 <div class="ticket">
@@ -566,13 +549,12 @@
                     <p style="font-size: 0.85rem; color: var(--secondary); margin-top: 15px; line-height: 1.6;">
                         Venue: Ahaspokuna hotel<br>
                         Time: 9.00 am to 4.00 pm<br>
-                        <span style="color: var(--primary); font-weight: 800;">Price: Rs. 5000.00</span>
+                        <span style="color: var(--primary); font-weight: 800;">Total: Rs. 5000.00</span>
                     </p>
                 </div>
                 ${isVerified ? `<button class="btn btn-success" onclick="downloadTicketFromData()">Download Digital Pass</button>` : ''}
             `;
 
-            // Control Visibility of zones
             selectionZone.classList.add('hidden');
             balanceZone.classList.add('hidden');
 
@@ -582,7 +564,7 @@
                 selectionZone.innerHTML = `
                     <div style="text-align:center; padding: 25px; background: rgba(255,255,255,0.03); border-radius: 12px; border: 1px dashed var(--border);">
                         <p style="color:var(--warning); margin:0; font-weight:600;">Receipt under review...</p>
-                        <p style="color:var(--secondary); font-size:0.8rem; margin-top:5px;">Our team is verifying your transaction. Please check back later.</p>
+                        <p style="color:var(--secondary); font-size:0.8rem; margin-top:5px;">Check back once verified by admin.</p>
                     </div>`;
                 selectionZone.classList.remove('hidden');
             } else if (isAdvanceVerified) {
@@ -606,8 +588,7 @@
                     paymentType: selectedPayType 
                 });
                 toast("Payment submitted");
-                btn.disabled = false;
-                btn.innerText = "Submit Verification";
+                btn.disabled = false; btn.innerText = "Submit Verification";
             };
             reader.readAsDataURL(file);
         }
@@ -616,8 +597,7 @@
             const file = document.getElementById('balance-upload-input').files[0];
             if (!file) return toast("Select a file");
             const btn = document.getElementById('balance-btn');
-            btn.disabled = true;
-            btn.innerText = "Processing...";
+            btn.disabled = true; btn.innerText = "Processing...";
 
             const reader = new FileReader();
             reader.onload = async (e) => {
@@ -627,8 +607,7 @@
                     balanceSlip: e.target.result 
                 });
                 toast("Balance slip submitted");
-                btn.disabled = false;
-                btn.innerText = "Submit Balance Receipt";
+                btn.disabled = false; btn.innerText = "Submit Balance Receipt";
             };
             reader.readAsDataURL(file);
         }
@@ -646,20 +625,8 @@
                 });
 
                 if (!found) return toast("Invalid ID");
-
-                if (found.status !== 'verified') {
-                    return openModal("Warning", `
-                        <div style="text-align: center;">
-                            <h3 style="color: var(--warning);">Payment Incomplete</h3>
-                            <p style="color: var(--secondary);">Member <b>${found.name}</b> has not completed full payment.</p>
-                            <p style="color: var(--primary);">Status: ${found.status.replace('_', ' ')}</p>
-                        </div>
-                    `);
-                }
-
-                if (found.checkedIn === true) {
-                    return openModal("Access Denied", `<h3 style="color: var(--danger);">Already Checked In</h3>`);
-                }
+                if (found.status !== 'verified') return toast("Payment Incomplete");
+                if (found.checkedIn === true) return toast("Already Checked In");
 
                 await getCollection().doc(found.id).update({ checkedIn: true, checkedInAt: firebase.firestore.FieldValue.serverTimestamp() });
                 openModal("Success", `<h2 style="color: var(--success);">ACCESS GRANTED</h2><p>${found.name}</p>`);
@@ -695,23 +662,22 @@
             stats.innerHTML = `
                 <div class="summary-card"><span class="summary-val">${users.length}</span><span class="summary-lab">Members</span></div>
                 <div class="summary-card"><span class="summary-val" style="color:var(--warning)">${waiting.length}</span><span class="summary-lab">Queued</span></div>
-                <div class="summary-card"><span class="summary-val" style="color:var(--primary)">${advance}</span><span class="summary-lab">Half Paid</span></div>
+                <div class="summary-card"><span class="summary-val" style="color:var(--primary)">${advance}</span><span class="summary-lab">Part Paid</span></div>
                 <div class="summary-card"><span class="summary-val" style="color:var(--success)">${verified.length}</span><span class="summary-lab">Verified</span></div>
             `;
 
             queue.innerHTML = '';
             waiting.forEach(u => {
                 const div = document.createElement('div'); div.className = 'list-item';
-                const typeText = u.status === 'waiting_balance' ? 'BALANCE' : (u.paymentType === 'advance' ? 'ADVANCE' : 'FULL');
+                const typeText = u.status === 'waiting_balance' ? 'BALANCE DUE' : (u.paymentType === 'advance' ? 'ADVANCE' : 'FULL');
                 div.innerHTML = `
                     <div style="font-size:0.85rem;">
                         <b>${u.name}</b><br>
-                        <small style="color:var(--primary); font-weight:800;">${typeText}</small>
+                        <small style="color:var(--primary); font-weight:800;">TYPE: ${typeText}</small>
                     </div>
                     <div style="display:flex; gap:5px;">
-                        <button class="btn btn-sm btn-ghost" onclick="viewSlips('${u.id}')">View</button>
+                        <button class="btn btn-sm btn-ghost" onclick="viewSlips('${u.id}')">Review Slips</button>
                         <button class="btn btn-sm" onclick="approveMember('${u.id}')">Approve</button>
-                        <button class="btn btn-sm btn-danger-ghost" onclick="rejectMember('${u.id}')">X</button>
                     </div>`;
                 queue.appendChild(div);
             });
@@ -720,7 +686,10 @@
             verified.forEach(u => {
                 const div = document.createElement('div'); div.className = 'list-item';
                 div.innerHTML = `<div style="font-size:0.85rem;">${u.name}</div>
-                    <button class="btn btn-sm btn-ghost" onclick="downloadTicketFromId('${u.id}')">Get Pass</button>`;
+                    <div style="display:flex; gap:5px;">
+                        <button class="btn btn-sm btn-ghost" onclick="viewSlips('${u.id}')">Slips</button>
+                        <button class="btn btn-sm btn-ghost" onclick="downloadTicketFromId('${u.id}')">Ticket</button>
+                    </div>`;
                 all.appendChild(div);
             });
         }
@@ -734,33 +703,43 @@
                 nextStatus = 'advance_paid';
                 toast("Advance Approved");
             } else {
-                toast("Fully Verified");
+                toast("Full Access Verified");
             }
 
             await getCollection().doc(id).update({ status: nextStatus });
         }
 
-        async function rejectMember(id) {
-            if(confirm("Reject this payment? Users must re-upload.")) {
-                await getCollection().doc(id).update({ status: 'unpaid', slip: null, balanceSlip: null });
-            }
-        }
-
         async function viewSlips(id) {
             const doc = await getCollection().doc(id).get();
             const u = doc.data();
-            let content = '';
+            let content = '<div style="text-align:left;">';
             
             if (u.slip) {
-                content += `<p style="color:var(--primary); font-weight:700; margin-top:0;">Initial Slip (${u.paymentType})</p>
-                            <img src="${u.slip}" class="preview-img" style="margin-top:0;">`;
+                content += `
+                    <p style="color:var(--primary); font-weight:700; margin: 10px 0 5px;">1. Initial Payment Slip (${u.paymentType})</p>
+                    <img src="${u.slip}" class="preview-img">
+                    <button class="btn btn-sm" onclick="downloadFile('${u.name}_Initial_Slip', '${u.slip}')">Download Initial Slip</button>
+                `;
             }
             if (u.balanceSlip) {
-                content += `<p style="color:var(--success); font-weight:700; border-top: 1px solid var(--border); padding-top:15px;">Balance Slip (Rs. 2500)</p>
-                            <img src="${u.balanceSlip}" class="preview-img" style="margin-top:0;">`;
+                content += `
+                    <div style="margin-top: 25px; border-top: 1px solid var(--border); padding-top: 20px;">
+                        <p style="color:var(--success); font-weight:700; margin: 0 0 5px;">2. Balance Payment Slip</p>
+                        <img src="${u.balanceSlip}" class="preview-img">
+                        <button class="btn btn-sm btn-success" onclick="downloadFile('${u.name}_Balance_Slip', '${u.balanceSlip}')">Download Balance Slip</button>
+                    </div>
+                `;
             }
+            content += '</div>';
 
             openModal(`Receipts: ${u.name}`, content);
+        }
+
+        function downloadFile(fileName, dataUrl) {
+            const link = document.createElement('a');
+            link.download = `${fileName.replace(/\s+/g, '_')}.png`;
+            link.href = dataUrl;
+            link.click();
         }
 
         // --- 4. TICKET ENGINE ---
@@ -773,7 +752,7 @@
             ctx.strokeStyle = '#3b82f6'; ctx.lineWidth = 15; ctx.strokeRect(0, 0, canvas.width, canvas.height);
             ctx.setLineDash([10, 10]); ctx.lineWidth = 2; ctx.strokeRect(30, 30, canvas.width - 60, canvas.height - 60); ctx.setLineDash([]);
 
-            ctx.fillStyle = '#3b82f6'; ctx.font = 'bold 24px Arial'; ctx.textAlign = 'center'; ctx.fillText('OFFICIAL EVENT ACCESS PASS', canvas.width/2, 80);
+            ctx.fillStyle = '#3b82f6'; ctx.font = 'bold 24px Arial'; ctx.textAlign = 'center'; ctx.fillText('EVENT ACCESS PASS', canvas.width/2, 80);
             ctx.fillStyle = '#ffffff'; ctx.font = '900 65px Arial'; ctx.fillText(u.ticketID, canvas.width/2, 180);
             ctx.fillStyle = '#3b82f6'; ctx.font = 'bold 30px Arial'; ctx.fillText(u.name.toUpperCase(), canvas.width/2, 240);
             
@@ -783,7 +762,7 @@
             ctx.fillStyle = '#3b82f6'; ctx.font = 'bold 22px Arial';
             ctx.fillText('PAID IN FULL: RS. 5000.00', canvas.width/2, 375);
 
-            ctx.fillStyle = '#64748b'; ctx.font = '14px Arial'; ctx.fillText('Verified Digitally. Show at entrance.', canvas.width/2, 430);
+            ctx.fillStyle = '#64748b'; ctx.font = '14px Arial'; ctx.fillText('Valid for single entry.', canvas.width/2, 430);
             
             const link = document.createElement('a');
             link.download = `Pass_${u.name.replace(/\s+/g, '_')}.png`;
