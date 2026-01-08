@@ -171,6 +171,7 @@
         .btn-success { background: var(--success); }
         .btn-warning { background: var(--warning); color: #000; }
         .btn-danger-ghost { background: transparent; color: var(--danger); border: 1px solid rgba(239, 68, 68, 0.2); }
+        .btn-danger { background: var(--danger); color: white; }
 
         .ticket {
             text-align: center;
@@ -772,6 +773,7 @@
                     <div style="display:flex; gap:5px;">
                         <button class="btn btn-sm btn-ghost" onclick="viewSlips('${u.id}')">Slips</button>
                         <button class="btn btn-sm" onclick="approveMember('${u.id}')">Approve</button>
+                        <button class="btn btn-sm btn-danger-ghost" onclick="rejectMember('${u.id}')">Reject</button>
                     </div>`;
                 queue.appendChild(div);
             });
@@ -783,6 +785,7 @@
                     <div style="font-size:0.85rem;">${u.name}</div>
                     <div style="display:flex; gap:5px;">
                         <button class="btn btn-sm btn-ghost" onclick="viewSlips('${u.id}')">Slips</button>
+                        <button class="btn btn-sm btn-danger-ghost" onclick="rejectMember('${u.id}')">Reject</button>
                     </div>`;
                 halfList.appendChild(div);
             });
@@ -812,6 +815,18 @@
             }
 
             await getCollection().doc(id).update({ status: nextStatus });
+        }
+
+        async function rejectMember(id) {
+            if (!confirm("Are you sure you want to reject this payment? The user will have to upload the slip again.")) return;
+            
+            await getCollection().doc(id).update({
+                status: 'unpaid',
+                slip: null,
+                balanceSlip: null,
+                paymentType: null
+            });
+            toast("Member payment rejected");
         }
 
         async function viewSlips(id) {
