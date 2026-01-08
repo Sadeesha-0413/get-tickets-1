@@ -318,6 +318,7 @@
             padding: 20px;
             color: var(--primary);
             border-radius: 20px;
+            text-transform: uppercase;
         }
 
         .gate-input:focus {
@@ -701,13 +702,14 @@
                 }
 
                 if (found.checkedIn === true) {
-                    return openModal("Access Denied", `
+                    return openModal("Already Entered", `
                         <div style="text-align:center;" class="status-card-animate">
                             <div style="width: 80px; height: 80px; background: var(--danger-bg); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 20px; border: 2px solid var(--danger);">
                                 <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="var(--danger)" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path></svg>
                             </div>
-                            <h2 style="color:var(--danger);">ALREADY ENTERED</h2>
-                            <p style="color:var(--secondary);">This ticket was checked in earlier.</p>
+                            <h2 style="color:var(--danger); margin-bottom: 5px;">DENIED</h2>
+                            <p style="color:var(--text); font-weight: 800; font-size: 1.2rem; margin: 0;">${found.name}</p>
+                            <p style="color:var(--secondary); margin-top: 5px;">This member already checked in.</p>
                         </div>
                     `);
                 }
@@ -752,13 +754,13 @@
             const waiting = users.filter(u => u.status === 'waiting' || u.status === 'waiting_balance');
             const verified = users.filter(u => u.status === 'verified');
             const halfPaid = users.filter(u => u.status === 'advance_paid');
-            const checkedIn = users.filter(u => u.checkedIn === true).length;
+            const checkedInCount = users.filter(u => u.checkedIn === true).length;
 
             stats.innerHTML = `
                 <div class="summary-card"><span class="summary-val">${users.length}</span><span class="summary-lab">Total</span></div>
                 <div class="summary-card"><span class="summary-val" style="color:var(--warning)">${waiting.length}</span><span class="summary-lab">Pending</span></div>
                 <div class="summary-card"><span class="summary-val" style="color:var(--primary)">${halfPaid.length}</span><span class="summary-lab">Half-Paid</span></div>
-                <div class="summary-card"><span class="summary-val" style="color:var(--success)">${checkedIn}</span><span class="summary-lab">Entries</span></div>
+                <div class="summary-card"><span class="summary-val" style="color:var(--success)">${checkedInCount}</span><span class="summary-lab">Entries</span></div>
             `;
 
             queue.innerHTML = '';
@@ -768,12 +770,12 @@
                 div.innerHTML = `
                     <div style="font-size:0.85rem;">
                         <b>${u.name}</b><br>
-                        <small style="color:var(--primary); font-weight:800;">RECHECK: ${typeText}</small>
+                        <small style="color:var(--primary); font-weight:800;">VERIFY: ${typeText}</small>
                     </div>
                     <div style="display:flex; gap:5px;">
                         <button class="btn btn-sm btn-ghost" onclick="viewSlips('${u.id}')">Slips</button>
                         <button class="btn btn-sm" onclick="approveMember('${u.id}')">Approve</button>
-                        <button class="btn btn-sm btn-danger-ghost" onclick="rejectMember('${u.id}')">Reject</button>
+                        <button class="btn btn-sm btn-danger-ghost" onclick="initiateReject('${u.id}')">Reject</button>
                     </div>`;
                 queue.appendChild(div);
             });
@@ -785,7 +787,7 @@
                     <div style="font-size:0.85rem;">${u.name}</div>
                     <div style="display:flex; gap:5px;">
                         <button class="btn btn-sm btn-ghost" onclick="viewSlips('${u.id}')">Slips</button>
-                        <button class="btn btn-sm btn-danger-ghost" onclick="rejectMember('${u.id}')">Reject</button>
+                        <button class="btn btn-sm btn-danger-ghost" onclick="initiateReject('${u.id}')">Reject</button>
                     </div>`;
                 halfList.appendChild(div);
             });
@@ -796,6 +798,7 @@
                 div.innerHTML = `<div style="font-size:0.85rem;">${u.name} <small style="color:var(--success)">${u.checkedIn ? '[IN]' : '[OK]'}</small></div>
                     <div style="display:flex; gap:5px;">
                         <button class="btn btn-sm btn-ghost" onclick="viewSlips('${u.id}')">Slips</button>
+                        <button class="btn btn-sm btn-ghost" onclick="previewTicket('${u.id}')">View Pass</button>
                         <button class="btn btn-sm btn-ghost" onclick="downloadTicketFromId('${u.id}')">Pass</button>
                     </div>`;
                 allList.appendChild(div);
@@ -811,22 +814,45 @@
                 nextStatus = 'advance_paid';
                 toast("Advance Approved");
             } else {
-                toast("Member Fully Verified");
+                toast("Full Access Verified");
             }
 
             await getCollection().doc(id).update({ status: nextStatus });
         }
 
-        async function rejectMember(id) {
-            if (!confirm("Are you sure you want to reject this payment? The user will have to upload the slip again.")) return;
-            
+        function initiateReject(id) {
+            const content = `
+                <div style="text-align:center;">
+                    <p style="margin-bottom:20px;">Are you sure you want to reject this slip? The user will be reset to "Unpaid" and must re-upload.</p>
+                    <button class="btn btn-danger" onclick="executeReject('${id}')">Yes, Reject Slip</button>
+                </div>
+            `;
+            openModal("Reject Payment", content);
+        }
+
+        async function executeReject(id) {
             await getCollection().doc(id).update({
                 status: 'unpaid',
                 slip: null,
                 balanceSlip: null,
                 paymentType: null
             });
-            toast("Member payment rejected");
+            closeModal();
+            toast("Payment rejected and reset.");
+        }
+
+        async function previewTicket(id) {
+            const doc = await getCollection().doc(id).get();
+            const u = doc.data();
+            const content = `
+                <div class="ticket" style="margin:0; border-style:solid; border-width:1px;">
+                    <span class="badge badge-ok">${u.checkedIn ? 'CHECKED IN' : 'VERIFIED'}</span>
+                    <span class="ticket-no" style="font-size:1.5rem;">${u.ticketID}</span>
+                    <p style="font-weight:700; color:white;">${u.name}</p>
+                    <p style="font-size:0.75rem; color:var(--secondary);">Venue: Ahaspokuna hotel</p>
+                </div>
+            `;
+            openModal("Digital Ticket Preview", content);
         }
 
         async function viewSlips(id) {
