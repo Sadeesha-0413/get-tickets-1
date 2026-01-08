@@ -203,6 +203,7 @@
         .badge-wait { background: var(--warning-bg); color: var(--warning); border: 1px solid var(--warning); }
         .badge-ok { background: var(--success-bg); color: var(--success); border: 1px solid var(--success); }
         .badge-half { background: rgba(59, 130, 246, 0.1); color: var(--primary); border: 1px solid var(--primary); }
+        .badge-danger { background: var(--danger-bg); color: var(--danger); border: 1px solid var(--danger); }
 
         .summary-grid {
             display: grid;
@@ -584,6 +585,7 @@
             const isAdvanceVerified = u.status === 'advance_paid';
             const isWaiting = u.status === 'waiting' || u.status === 'waiting_balance';
             const isCheckedIn = u.checkedIn === true;
+            const isRejected = u.status === 'rejected';
 
             let badgeClass = 'badge-wait';
             let statusText = 'Payment Required';
@@ -592,8 +594,14 @@
             else if (isVerified) { badgeClass = 'badge-ok'; statusText = 'Access Verified'; }
             else if (isAdvanceVerified) { badgeClass = 'badge-half'; statusText = 'Partially Paid'; }
             else if (isWaiting) { badgeClass = 'badge-wait'; statusText = 'Review Pending'; }
+            else if (isRejected) { badgeClass = 'badge-danger'; statusText = 'Slip Rejected'; }
 
             display.innerHTML = `
+                ${isRejected ? `
+                    <div style="background: var(--danger-bg); border: 1px solid var(--danger); padding: 15px; border-radius: 12px; margin-bottom: 20px; color: var(--danger); font-weight: 600; text-align: center; font-size: 0.9rem;">
+                        Your payment slip was rejected. Please try again and upload a clear receipt.
+                    </div>
+                ` : ''}
                 <div class="ticket">
                     <span class="badge ${badgeClass}">${statusText}</span>
                     <span class="ticket-no">${u.ticketID}</span>
@@ -610,7 +618,7 @@
             selectionZone.classList.add('hidden');
             balanceZone.classList.add('hidden');
 
-            if (u.status === 'unpaid') {
+            if (u.status === 'unpaid' || u.status === 'rejected') {
                 selectionZone.classList.remove('hidden');
             } else if (isWaiting) {
                 selectionZone.innerHTML = `
@@ -823,7 +831,7 @@
         function initiateReject(id) {
             const content = `
                 <div style="text-align:center;">
-                    <p style="margin-bottom:20px;">Are you sure you want to reject this slip? The user will be reset to "Unpaid" and must re-upload.</p>
+                    <p style="margin-bottom:20px;">Are you sure you want to reject this slip? The user will be reset and must re-upload.</p>
                     <button class="btn btn-danger" onclick="executeReject('${id}')">Yes, Reject Slip</button>
                 </div>
             `;
@@ -832,13 +840,13 @@
 
         async function executeReject(id) {
             await getCollection().doc(id).update({
-                status: 'unpaid',
+                status: 'rejected',
                 slip: null,
                 balanceSlip: null,
                 paymentType: null
             });
             closeModal();
-            toast("Payment rejected and reset.");
+            toast("Payment rejected.");
         }
 
         async function previewTicket(id) {
