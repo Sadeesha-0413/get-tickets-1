@@ -77,7 +77,7 @@
 
         .container {
             width: 100%;
-            max-width: 480px;
+            max-width: 520px;
             margin: 20px auto;
             padding: 0 20px;
             flex: 1;
@@ -169,6 +169,7 @@
 
         .btn-sm { padding: 8px 12px; font-size: 0.75rem; width: auto; }
         .btn-success { background: var(--success); }
+        .btn-warning { background: var(--warning); color: #000; }
         .btn-danger-ghost { background: transparent; color: var(--danger); border: 1px solid rgba(239, 68, 68, 0.2); }
 
         .ticket {
@@ -204,27 +205,27 @@
 
         .summary-grid {
             display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 15px;
+            grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+            gap: 12px;
             margin-bottom: 30px;
         }
 
         .summary-card {
             background: rgba(255,255,255,0.03);
-            padding: 20px;
+            padding: 15px;
             border-radius: 16px;
             border: 1px solid var(--border);
             text-align: center;
         }
 
-        .summary-val { display: block; font-size: 1.5rem; font-weight: 800; color: var(--primary); }
-        .summary-lab { font-size: 0.65rem; font-weight: 600; color: var(--muted); text-transform: uppercase; margin-top: 4px; }
+        .summary-val { display: block; font-size: 1.2rem; font-weight: 800; color: var(--primary); }
+        .summary-lab { font-size: 0.6rem; font-weight: 600; color: var(--muted); text-transform: uppercase; margin-top: 4px; }
 
         .list-item {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 15px 0;
+            padding: 12px 0;
             border-bottom: 1px solid var(--border);
         }
 
@@ -279,6 +280,49 @@
         .payment-option h4 { margin: 0; font-size: 1.1rem; }
         .payment-option p { margin: 5px 0 0; color: var(--secondary); font-size: 0.85rem; }
         .payment-option .price { position: absolute; top: 20px; right: 20px; font-weight: 800; color: var(--primary); }
+
+        /* Modernized Gate CSS */
+        .gate-container {
+            background: linear-gradient(145deg, #1e293b, #0f172a);
+            padding: 40px 30px;
+            border-radius: 30px;
+            border: 2px solid var(--primary);
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.4);
+        }
+
+        .gate-scanner-bg {
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: repeating-linear-gradient(0deg, transparent, transparent 1px, rgba(59,130,246,0.05) 1px, rgba(59,130,246,0.05) 20px);
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        .gate-input-wrapper {
+            position: relative;
+            z-index: 2;
+            margin: 20px 0;
+        }
+
+        .gate-input {
+            background: rgba(0,0,0,0.3);
+            border: 2px solid var(--border);
+            font-size: 2rem;
+            text-align: center;
+            font-family: monospace;
+            letter-spacing: 0.2em;
+            padding: 20px;
+            color: var(--primary);
+            border-radius: 20px;
+        }
+
+        .gate-input:focus {
+            border-color: var(--primary);
+            background: rgba(0,0,0,0.5);
+        }
 
         footer { text-align: center; padding: 30px 20px; color: var(--muted); font-size: 0.8rem; letter-spacing: 0.05em; }
 
@@ -378,30 +422,36 @@
 
         <!-- ADMIN DASHBOARD -->
         <section id="admin-dashboard-view" class="hidden">
-            <div class="card" style="border: 2px solid var(--primary);">
-                <h3 style="color: var(--primary); text-align: center;">Gate Check-In</h3>
-                <div class="form-group">
-                    <label>Verify Ticket ID</label>
-                    <input type="text" id="id-verify-input" placeholder="e.g. T12345" style="text-align: center; text-transform: uppercase;">
+            <div class="gate-container">
+                <div class="gate-scanner-bg"></div>
+                <h3 style="color: var(--primary); text-transform: uppercase; letter-spacing: 0.2em; font-size: 0.8rem; margin-bottom: 5px;">Secure Gate Access</h3>
+                <h2 style="margin-bottom: 30px;">TICKET SCANNER</h2>
+                <div class="gate-input-wrapper">
+                    <input type="text" id="id-verify-input" class="gate-input" placeholder="T00000" maxlength="6">
                 </div>
-                <button class="btn" onclick="validateTicketID()">Check-In Ticket</button>
+                <button class="btn" onclick="validateTicketID()" style="padding: 20px; font-size: 1.1rem; box-shadow: 0 10px 20px rgba(59,130,246,0.3);">CHECK-IN MEMBER</button>
             </div>
 
-            <div class="card">
-                <h3 style="font-size: 0.9rem; text-align: center; text-transform: uppercase; margin-bottom: 25px; letter-spacing: 0.1em;">Management Overview</h3>
+            <div class="card" style="margin-top: 20px;">
+                <h3 style="font-size: 0.75rem; text-align: left; text-transform: uppercase; margin-bottom: 20px; letter-spacing: 0.1em; color: var(--secondary);">Analytics Overview</h3>
                 <div id="admin-stats-summary" class="summary-grid"></div>
                 
                 <div style="border-top: 1px solid var(--border); padding-top: 20px;">
-                    <label>Verification Queue</label>
+                    <label>Approval Queue</label>
                     <div id="admin-queue-list"></div>
                 </div>
 
                 <div style="border-top: 1px solid var(--border); margin-top: 30px; padding-top: 20px;">
-                    <label>Verified List</label>
-                    <div id="admin-all-list" style="max-height: 300px; overflow-y: auto;"></div>
+                    <label>Advance Paid (Balance Pending)</label>
+                    <div id="admin-half-list"></div>
                 </div>
 
-                <button class="btn btn-ghost" onclick="logout()">Logout Session</button>
+                <div style="border-top: 1px solid var(--border); margin-top: 30px; padding-top: 20px;">
+                    <label>Fully Verified (Ready)</label>
+                    <div id="admin-all-list" style="max-height: 400px; overflow-y: auto;"></div>
+                </div>
+
+                <button class="btn btn-ghost" onclick="logout()">Logout Administrative Session</button>
             </div>
         </section>
     </div>
@@ -624,14 +674,56 @@
                     if (doc.data().ticketID === idInput) found = { id: doc.id, ...doc.data() };
                 });
 
-                if (!found) return toast("Invalid ID");
-                if (found.status !== 'verified') return toast("Payment Incomplete");
-                if (found.checkedIn === true) return toast("Already Checked In");
+                if (!found) {
+                    return openModal("Invalid ID", `
+                        <div style="text-align:center;" class="status-card-animate">
+                            <div style="width: 80px; height: 80px; background: var(--danger-bg); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 20px; border: 2px solid var(--danger);">
+                                <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="var(--danger)" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                            </div>
+                            <h2 style="color:var(--danger);">NOT FOUND</h2>
+                            <p style="color:var(--secondary);">This Ticket ID does not exist.</p>
+                        </div>
+                    `);
+                }
+
+                if (found.status !== 'verified') {
+                    return openModal("Incomplete", `
+                        <div style="text-align:center;" class="status-card-animate">
+                             <div style="width: 80px; height: 80px; background: var(--warning-bg); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 20px; border: 2px solid var(--warning);">
+                                <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="var(--warning)" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>
+                            </div>
+                            <h2 style="color:var(--warning);">UNVERIFIED</h2>
+                            <p style="color:var(--secondary);">Member: <b>${found.name}</b></p>
+                            <p style="color:var(--warning);">Balance payment is required.</p>
+                        </div>
+                    `);
+                }
+
+                if (found.checkedIn === true) {
+                    return openModal("Access Denied", `
+                        <div style="text-align:center;" class="status-card-animate">
+                            <div style="width: 80px; height: 80px; background: var(--danger-bg); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 20px; border: 2px solid var(--danger);">
+                                <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="var(--danger)" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path></svg>
+                            </div>
+                            <h2 style="color:var(--danger);">ALREADY ENTERED</h2>
+                            <p style="color:var(--secondary);">This ticket was checked in earlier.</p>
+                        </div>
+                    `);
+                }
 
                 await getCollection().doc(found.id).update({ checkedIn: true, checkedInAt: firebase.firestore.FieldValue.serverTimestamp() });
-                openModal("Success", `<h2 style="color: var(--success);">ACCESS GRANTED</h2><p>${found.name}</p>`);
+                openModal("Access Granted", `
+                    <div style="text-align:center;" class="status-card-animate">
+                        <div style="width: 100px; height: 100px; background: var(--success-bg); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 25px; border: 3px solid var(--success);">
+                            <svg width="50" height="50" viewBox="0 0 24 24" fill="none" stroke="var(--success)" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                        </div>
+                        <h2 style="color:var(--success); font-size: 2rem; margin-bottom: 5px;">SUCCESS</h2>
+                        <p style="font-size: 1.2rem; font-weight: 700;">${found.name}</p>
+                        <p style="color:var(--secondary);">Welcome to the event!</p>
+                    </div>
+                `);
                 document.getElementById('id-verify-input').value = '';
-            } catch (err) { toast("Search Error"); }
+            } catch (err) { toast("Check-in error"); }
         }
 
         function adminLogin() {
@@ -653,44 +745,57 @@
         function renderAdminUI(users) {
             const stats = document.getElementById('admin-stats-summary');
             const queue = document.getElementById('admin-queue-list');
-            const all = document.getElementById('admin-all-list');
+            const halfList = document.getElementById('admin-half-list');
+            const allList = document.getElementById('admin-all-list');
 
             const waiting = users.filter(u => u.status === 'waiting' || u.status === 'waiting_balance');
             const verified = users.filter(u => u.status === 'verified');
-            const advance = users.filter(u => u.status === 'advance_paid').length;
+            const halfPaid = users.filter(u => u.status === 'advance_paid');
+            const checkedIn = users.filter(u => u.checkedIn === true).length;
 
             stats.innerHTML = `
-                <div class="summary-card"><span class="summary-val">${users.length}</span><span class="summary-lab">Members</span></div>
-                <div class="summary-card"><span class="summary-val" style="color:var(--warning)">${waiting.length}</span><span class="summary-lab">Queued</span></div>
-                <div class="summary-card"><span class="summary-val" style="color:var(--primary)">${advance}</span><span class="summary-lab">Part Paid</span></div>
-                <div class="summary-card"><span class="summary-val" style="color:var(--success)">${verified.length}</span><span class="summary-lab">Verified</span></div>
+                <div class="summary-card"><span class="summary-val">${users.length}</span><span class="summary-lab">Total</span></div>
+                <div class="summary-card"><span class="summary-val" style="color:var(--warning)">${waiting.length}</span><span class="summary-lab">Pending</span></div>
+                <div class="summary-card"><span class="summary-val" style="color:var(--primary)">${halfPaid.length}</span><span class="summary-lab">Half-Paid</span></div>
+                <div class="summary-card"><span class="summary-val" style="color:var(--success)">${checkedIn}</span><span class="summary-lab">Entries</span></div>
             `;
 
             queue.innerHTML = '';
             waiting.forEach(u => {
                 const div = document.createElement('div'); div.className = 'list-item';
-                const typeText = u.status === 'waiting_balance' ? 'BALANCE DUE' : (u.paymentType === 'advance' ? 'ADVANCE' : 'FULL');
+                const typeText = u.status === 'waiting_balance' ? 'BALANCE' : (u.paymentType === 'advance' ? 'ADVANCE' : 'FULL');
                 div.innerHTML = `
                     <div style="font-size:0.85rem;">
                         <b>${u.name}</b><br>
-                        <small style="color:var(--primary); font-weight:800;">TYPE: ${typeText}</small>
+                        <small style="color:var(--primary); font-weight:800;">RECHECK: ${typeText}</small>
                     </div>
                     <div style="display:flex; gap:5px;">
-                        <button class="btn btn-sm btn-ghost" onclick="viewSlips('${u.id}')">Review Slips</button>
+                        <button class="btn btn-sm btn-ghost" onclick="viewSlips('${u.id}')">Slips</button>
                         <button class="btn btn-sm" onclick="approveMember('${u.id}')">Approve</button>
                     </div>`;
                 queue.appendChild(div);
             });
 
-            all.innerHTML = '';
-            verified.forEach(u => {
+            halfList.innerHTML = halfPaid.length ? '' : '<p style="color:var(--muted); font-size: 0.8rem; padding: 10px 0;">No members with pending balance.</p>';
+            halfPaid.forEach(u => {
                 const div = document.createElement('div'); div.className = 'list-item';
-                div.innerHTML = `<div style="font-size:0.85rem;">${u.name}</div>
+                div.innerHTML = `
+                    <div style="font-size:0.85rem;">${u.name}</div>
                     <div style="display:flex; gap:5px;">
                         <button class="btn btn-sm btn-ghost" onclick="viewSlips('${u.id}')">Slips</button>
-                        <button class="btn btn-sm btn-ghost" onclick="downloadTicketFromId('${u.id}')">Ticket</button>
                     </div>`;
-                all.appendChild(div);
+                halfList.appendChild(div);
+            });
+
+            allList.innerHTML = '';
+            verified.forEach(u => {
+                const div = document.createElement('div'); div.className = 'list-item';
+                div.innerHTML = `<div style="font-size:0.85rem;">${u.name} <small style="color:var(--success)">${u.checkedIn ? '[IN]' : '[OK]'}</small></div>
+                    <div style="display:flex; gap:5px;">
+                        <button class="btn btn-sm btn-ghost" onclick="viewSlips('${u.id}')">Slips</button>
+                        <button class="btn btn-sm btn-ghost" onclick="downloadTicketFromId('${u.id}')">Pass</button>
+                    </div>`;
+                allList.appendChild(div);
             });
         }
 
@@ -703,7 +808,7 @@
                 nextStatus = 'advance_paid';
                 toast("Advance Approved");
             } else {
-                toast("Full Access Verified");
+                toast("Member Fully Verified");
             }
 
             await getCollection().doc(id).update({ status: nextStatus });
@@ -716,23 +821,25 @@
             
             if (u.slip) {
                 content += `
-                    <p style="color:var(--primary); font-weight:700; margin: 10px 0 5px;">1. Initial Payment Slip (${u.paymentType})</p>
-                    <img src="${u.slip}" class="preview-img">
-                    <button class="btn btn-sm" onclick="downloadFile('${u.name}_Initial_Slip', '${u.slip}')">Download Initial Slip</button>
+                    <div style="padding:15px; background: rgba(59,130,246,0.05); border-radius:15px; border:1px solid var(--border); margin-bottom: 20px;">
+                        <p style="color:var(--primary); font-weight:700; margin: 0 0 10px; font-size: 0.85rem; text-transform:uppercase;">1. Initial Payment Slip (${u.paymentType})</p>
+                        <img src="${u.slip}" class="preview-img">
+                        <button class="btn btn-sm" style="width:100%;" onclick="downloadFile('${u.name}_Initial_Slip', '${u.slip}')">Download Initial Receipt</button>
+                    </div>
                 `;
             }
             if (u.balanceSlip) {
                 content += `
-                    <div style="margin-top: 25px; border-top: 1px solid var(--border); padding-top: 20px;">
-                        <p style="color:var(--success); font-weight:700; margin: 0 0 5px;">2. Balance Payment Slip</p>
+                    <div style="padding:15px; background: rgba(16,185,129,0.05); border-radius:15px; border:1px solid var(--border);">
+                        <p style="color:var(--success); font-weight:700; margin: 0 0 10px; font-size: 0.85rem; text-transform:uppercase;">2. Balance Payment Slip</p>
                         <img src="${u.balanceSlip}" class="preview-img">
-                        <button class="btn btn-sm btn-success" onclick="downloadFile('${u.name}_Balance_Slip', '${u.balanceSlip}')">Download Balance Slip</button>
+                        <button class="btn btn-sm btn-success" style="width:100%;" onclick="downloadFile('${u.name}_Balance_Slip', '${u.balanceSlip}')">Download Balance Receipt</button>
                     </div>
                 `;
             }
             content += '</div>';
 
-            openModal(`Receipts: ${u.name}`, content);
+            openModal(`Receipt Management: ${u.name}`, content);
         }
 
         function downloadFile(fileName, dataUrl) {
@@ -740,6 +847,7 @@
             link.download = `${fileName.replace(/\s+/g, '_')}.png`;
             link.href = dataUrl;
             link.click();
+            toast("Download Triggered");
         }
 
         // --- 4. TICKET ENGINE ---
@@ -752,9 +860,9 @@
             ctx.strokeStyle = '#3b82f6'; ctx.lineWidth = 15; ctx.strokeRect(0, 0, canvas.width, canvas.height);
             ctx.setLineDash([10, 10]); ctx.lineWidth = 2; ctx.strokeRect(30, 30, canvas.width - 60, canvas.height - 60); ctx.setLineDash([]);
 
-            ctx.fillStyle = '#3b82f6'; ctx.font = 'bold 24px Arial'; ctx.textAlign = 'center'; ctx.fillText('EVENT ACCESS PASS', canvas.width/2, 80);
-            ctx.fillStyle = '#ffffff'; ctx.font = '900 65px Arial'; ctx.fillText(u.ticketID, canvas.width/2, 180);
-            ctx.fillStyle = '#3b82f6'; ctx.font = 'bold 30px Arial'; ctx.fillText(u.name.toUpperCase(), canvas.width/2, 240);
+            ctx.fillStyle = '#3b82f6'; ctx.font = 'bold 24px Arial'; ctx.textAlign = 'center'; ctx.fillText('OFFICIAL EVENT PASS', canvas.width/2, 80);
+            ctx.fillStyle = '#ffffff'; ctx.font = '900 70px Arial'; ctx.fillText(u.ticketID, canvas.width/2, 185);
+            ctx.fillStyle = '#3b82f6'; ctx.font = 'bold 32px Arial'; ctx.fillText(u.name.toUpperCase(), canvas.width/2, 245);
             
             ctx.fillStyle = '#f8fafc'; ctx.font = '18px Arial';
             ctx.fillText('Venue: Ahaspokuna hotel', canvas.width/2, 300);
@@ -762,12 +870,13 @@
             ctx.fillStyle = '#3b82f6'; ctx.font = 'bold 22px Arial';
             ctx.fillText('PAID IN FULL: RS. 5000.00', canvas.width/2, 375);
 
-            ctx.fillStyle = '#64748b'; ctx.font = '14px Arial'; ctx.fillText('Valid for single entry.', canvas.width/2, 430);
+            ctx.fillStyle = '#64748b'; ctx.font = '14px Arial'; ctx.fillText('Non-Transferable • Gate Verify Required', canvas.width/2, 435);
             
             const link = document.createElement('a');
             link.download = `Pass_${u.name.replace(/\s+/g, '_')}.png`;
             link.href = canvas.toDataURL('image/png');
             link.click();
+            toast("Ticket downloaded");
         }
 
         function downloadTicketFromData() { generateTicket(currentMemberDoc); }
