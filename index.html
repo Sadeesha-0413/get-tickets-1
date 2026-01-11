@@ -303,7 +303,7 @@
             <p style="color:var(--secondary); font-size:0.95rem; margin-bottom:25px;">Access your digital event pass using your registered name.</p>
             <div class="form-group">
                 <label>Full Name</label>
-                <input type="text" id="member-name-input" placeholder="e.g. Jonathan Silwa">
+                <input type="text" id="member-name-input" placeholder="e.g. Miyanthi Kalhara">
             </div>
             <button class="btn" id="access-btn" onclick="memberAccess()">Access My Ticket</button>
             <button class="btn btn-ghost" onclick="switchView('admin-login')">Administrative Panel</button>
@@ -325,8 +325,8 @@
             <div class="card">
                 <div id="member-ticket-display"></div>
                 <div id="upload-zone" class="hidden" style="margin-top: 25px; border-top: 1px solid var(--border); padding-top: 25px;">
-                    <label>Upload Payment Proof (Rs. 3500.00)</label>
-                    <p style="color: var(--secondary); font-size: 0.8rem; margin-bottom: 15px;">Please upload a screenshot of your transaction receipt for the amount of Rs. 3500.00.</p>
+                    <label>Upload Payment Proof (Rs. 5000.00)</label>
+                    <p style="color: var(--secondary); font-size: 0.8rem; margin-bottom: 15px;">Please upload a screenshot of your transaction receipt for the amount of Rs. 5000.00.</p>
                     <input type="file" id="slip-upload-input" accept="image/*" style="padding: 10px; border: 1px dashed var(--border); width: 100%; color: var(--secondary);">
                     <button class="btn" id="upload-btn" style="margin-top: 20px;" onclick="uploadPayment()">Submit Verification</button>
                 </div>
@@ -705,13 +705,12 @@
             
             // Details
             ctx.fillStyle = '#f8fafc'; ctx.font = '18px Arial';
-            ctx.fillText('Venue: Green Vallet', canvas.width/2, 300);
-            ctx.fillText('Date: 2026/02/', canvas.width/2, 315);
+            ctx.fillText('Venue: Ahaspokuna hotel', canvas.width/2, 300);
             ctx.fillText('Time: 9.00 am to 4.00 pm', canvas.width/2, 330);
             
             // Price Tag
             ctx.fillStyle = '#3b82f6'; ctx.font = 'bold 22px Arial';
-            ctx.fillText('TICKET PRICE: RS. 3500.00', canvas.width/2, 375);
+            ctx.fillText('TICKET PRICE: RS. 5000.00', canvas.width/2, 375);
 
             ctx.fillStyle = '#64748b'; ctx.font = '14px Arial'; ctx.fillText('Valid for single entry. Verify Ticket ID at gate.', canvas.width/2, 430);
             
