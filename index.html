@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ticket Hub - Advance Payment Edition</title>
+    <title>Ticket Hub - ID Verification Edition</title>
     <!-- Firebase SDKs -->
     <script src="https://www.gstatic.com/firebasejs/11.0.2/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/11.0.2/firebase-firestore-compat.js"></script>
@@ -77,7 +77,7 @@
 
         .container {
             width: 100%;
-            max-width: 520px;
+            max-width: 480px;
             margin: 20px auto;
             padding: 0 20px;
             flex: 1;
@@ -167,11 +167,9 @@
             background: rgba(255,255,255,0.05);
         }
 
-        .btn-sm { padding: 8px 12px; font-size: 0.75rem; width: auto; }
+        .btn-sm { padding: 10px 16px; font-size: 0.75rem; width: auto; }
         .btn-success { background: var(--success); }
-        .btn-warning { background: var(--warning); color: #000; }
         .btn-danger-ghost { background: transparent; color: var(--danger); border: 1px solid rgba(239, 68, 68, 0.2); }
-        .btn-danger { background: var(--danger); color: white; }
 
         .ticket {
             text-align: center;
@@ -202,32 +200,30 @@
 
         .badge-wait { background: var(--warning-bg); color: var(--warning); border: 1px solid var(--warning); }
         .badge-ok { background: var(--success-bg); color: var(--success); border: 1px solid var(--success); }
-        .badge-half { background: rgba(59, 130, 246, 0.1); color: var(--primary); border: 1px solid var(--primary); }
-        .badge-danger { background: var(--danger-bg); color: var(--danger); border: 1px solid var(--danger); }
 
         .summary-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
-            gap: 12px;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
             margin-bottom: 30px;
         }
 
         .summary-card {
             background: rgba(255,255,255,0.03);
-            padding: 15px;
+            padding: 20px;
             border-radius: 16px;
             border: 1px solid var(--border);
             text-align: center;
         }
 
-        .summary-val { display: block; font-size: 1.2rem; font-weight: 800; color: var(--primary); }
-        .summary-lab { font-size: 0.6rem; font-weight: 600; color: var(--muted); text-transform: uppercase; margin-top: 4px; }
+        .summary-val { display: block; font-size: 1.5rem; font-weight: 800; color: var(--primary); }
+        .summary-lab { font-size: 0.65rem; font-weight: 600; color: var(--muted); text-transform: uppercase; margin-top: 4px; }
 
         .list-item {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 12px 0;
+            padding: 15px 0;
             border-bottom: 1px solid var(--border);
         }
 
@@ -247,8 +243,8 @@
         }
 
         .preview-img {
-            max-width: 100%; border-radius: 15px; margin: 15px 0;
-            border: 1px solid var(--border); box-shadow: 0 10px 20px rgba(0,0,0,0.3);
+            max-width: 100%; border-radius: 15px; margin: 20px 0;
+            border: 1px solid var(--border); box-shadow: 0 20px 40px rgba(0,0,0,0.5);
         }
 
         .hidden { display: none !important; }
@@ -263,74 +259,11 @@
             box-shadow: 0 15px 30px rgba(0, 0, 0, 0.4);
         }
 
-        .payment-option {
-            border: 2px solid var(--border);
-            border-radius: 16px;
-            padding: 20px;
-            margin-bottom: 15px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            text-align: left;
-            position: relative;
-        }
-
-        .payment-option.active {
-            border-color: var(--primary);
-            background: rgba(59, 130, 246, 0.05);
-        }
-
-        .payment-option h4 { margin: 0; font-size: 1.1rem; }
-        .payment-option p { margin: 5px 0 0; color: var(--secondary); font-size: 0.85rem; }
-        .payment-option .price { position: absolute; top: 20px; right: 20px; font-weight: 800; color: var(--primary); }
-
-        /* Modernized Gate CSS */
-        .gate-container {
-            background: linear-gradient(145deg, #1e293b, #0f172a);
-            padding: 40px 30px;
-            border-radius: 30px;
-            border: 2px solid var(--primary);
-            text-align: center;
-            position: relative;
-            overflow: hidden;
-            box-shadow: 0 20px 50px rgba(0,0,0,0.4);
-        }
-
-        .gate-scanner-bg {
-            position: absolute;
-            top: 0; left: 0; width: 100%; height: 100%;
-            background: repeating-linear-gradient(0deg, transparent, transparent 1px, rgba(59,130,246,0.05) 1px, rgba(59,130,246,0.05) 20px);
-            pointer-events: none;
-            z-index: 1;
-        }
-
-        .gate-input-wrapper {
-            position: relative;
-            z-index: 2;
-            margin: 20px 0;
-        }
-
-        .gate-input {
-            background: rgba(0,0,0,0.3);
-            border: 2px solid var(--border);
-            font-size: 2rem;
-            text-align: center;
-            font-family: monospace;
-            letter-spacing: 0.2em;
-            padding: 20px;
-            color: var(--primary);
-            border-radius: 20px;
-            text-transform: uppercase;
-        }
-
-        .gate-input:focus {
-            border-color: var(--primary);
-            background: rgba(0,0,0,0.5);
-        }
-
         footer { text-align: center; padding: 30px 20px; color: var(--muted); font-size: 0.8rem; letter-spacing: 0.05em; }
 
         #ticket-canvas { display: none; }
 
+        /* Animation for check-in message */
         @keyframes scaleIn {
             from { transform: scale(0.8); opacity: 0; }
             to { transform: scale(1); opacity: 1; }
@@ -355,6 +288,7 @@
         </div>
     </div>
 
+    <!-- Hidden canvas for PNG generation -->
     <canvas id="ticket-canvas" width="600" height="480"></canvas>
 
     <nav>
@@ -369,7 +303,7 @@
             <p style="color:var(--secondary); font-size:0.95rem; margin-bottom:25px;">Access your digital event pass using your registered name.</p>
             <div class="form-group">
                 <label>Full Name</label>
-                <input type="text" id="member-name-input" placeholder="e.g. Miyanthi Kalhara">
+                <input type="text" id="member-name-input" placeholder="e.g. Jonathan Silwa">
             </div>
             <button class="btn" id="access-btn" onclick="memberAccess()">Access My Ticket</button>
             <button class="btn btn-ghost" onclick="switchView('admin-login')">Administrative Panel</button>
@@ -390,71 +324,43 @@
         <section id="member-portal-view" class="hidden">
             <div class="card">
                 <div id="member-ticket-display"></div>
-                
-                <div id="payment-selection-zone" class="hidden" style="margin-top: 25px;">
-                    <label>Select Payment Option</label>
-                    <div class="payment-option active" id="opt-full" onclick="selectPayType('full')">
-                        <h4>Full Payment</h4>
-                        <p>Immediate ticket access upon verification.</p>
-                        <span class="price">Rs. 5000</span>
-                    </div>
-                    <div class="payment-option" id="opt-advance" onclick="selectPayType('advance')">
-                        <h4>Advance Payment</h4>
-                        <p>Pay half now. Pay balance later for ticket.</p>
-                        <span class="price">Rs. 2500</span>
-                    </div>
-
-                    <div id="upload-form" style="margin-top: 25px; border-top: 1px solid var(--border); padding-top: 20px;">
-                        <label id="upload-label">Upload Full Payment Slip (Rs. 5000.00)</label>
-                        <input type="file" id="slip-upload-input" accept="image/*" style="padding: 10px; border: 1px dashed var(--border); width: 100%; color: var(--secondary);">
-                        <button class="btn" id="upload-btn" style="margin-top: 20px;" onclick="uploadPayment()">Submit Verification</button>
-                    </div>
+                <div id="upload-zone" class="hidden" style="margin-top: 25px; border-top: 1px solid var(--border); padding-top: 25px;">
+                    <label>Upload Payment Proof (Rs. 3500.00)</label>
+                    <p style="color: var(--secondary); font-size: 0.8rem; margin-bottom: 15px;">Please upload a screenshot of your transaction receipt for the amount of Rs. 3500.00.</p>
+                    <input type="file" id="slip-upload-input" accept="image/*" style="padding: 10px; border: 1px dashed var(--border); width: 100%; color: var(--secondary);">
+                    <button class="btn" id="upload-btn" style="margin-top: 20px;" onclick="uploadPayment()">Submit Verification</button>
                 </div>
-
-                <div id="balance-payment-zone" class="hidden" style="margin-top: 25px; border-top: 2px solid var(--primary); padding-top: 25px;">
-                    <h3 style="color: var(--primary);">Balance Due: Rs. 2500.00</h3>
-                    <p style="color: var(--secondary); font-size: 0.85rem; margin-bottom: 15px;">Your advance payment is confirmed. Please upload the receipt for the remaining <b>Rs. 2500.00</b> to unlock your ticket.</p>
-                    <label>Upload Balance Slip</label>
-                    <input type="file" id="balance-upload-input" accept="image/*" style="padding: 10px; border: 1px dashed var(--border); width: 100%; color: var(--secondary);">
-                    <button class="btn" id="balance-btn" style="margin-top: 20px;" onclick="uploadBalancePayment()">Submit Balance Receipt</button>
-                </div>
-
-                <button class="btn btn-ghost" onclick="logout()" style="margin-top: 20px;">Sign Out</button>
+                <button class="btn btn-ghost" onclick="logout()">Sign Out</button>
             </div>
         </section>
 
         <!-- ADMIN DASHBOARD -->
         <section id="admin-dashboard-view" class="hidden">
-            <div class="gate-container">
-                <div class="gate-scanner-bg"></div>
-                <h3 style="color: var(--primary); text-transform: uppercase; letter-spacing: 0.2em; font-size: 0.8rem; margin-bottom: 5px;">Secure Gate Access</h3>
-                <h2 style="margin-bottom: 30px;">TICKET SCANNER</h2>
-                <div class="gate-input-wrapper">
-                    <input type="text" id="id-verify-input" class="gate-input" placeholder="T00000" maxlength="6">
+            <!-- ID Verification Tool -->
+            <div class="card" style="border: 2px solid var(--primary);">
+                <h3 style="color: var(--primary); text-align: center;">Gate Check-In</h3>
+                <div class="form-group">
+                    <label>Verify Ticket ID</label>
+                    <input type="text" id="id-verify-input" placeholder="e.g. T12345" style="text-align: center; text-transform: uppercase;">
                 </div>
-                <button class="btn" onclick="validateTicketID()" style="padding: 20px; font-size: 1.1rem; box-shadow: 0 10px 20px rgba(59,130,246,0.3);">CHECK-IN MEMBER</button>
+                <button class="btn" onclick="validateTicketID()">Check-In Ticket</button>
             </div>
 
-            <div class="card" style="margin-top: 20px;">
-                <h3 style="font-size: 0.75rem; text-align: left; text-transform: uppercase; margin-bottom: 20px; letter-spacing: 0.1em; color: var(--secondary);">Analytics Overview</h3>
+            <div class="card">
+                <h3 style="font-size: 0.9rem; text-align: center; text-transform: uppercase; margin-bottom: 25px; letter-spacing: 0.1em;">Management Overview</h3>
                 <div id="admin-stats-summary" class="summary-grid"></div>
                 
                 <div style="border-top: 1px solid var(--border); padding-top: 20px;">
-                    <label>Approval Queue</label>
+                    <label>Verification Queue</label>
                     <div id="admin-queue-list"></div>
                 </div>
 
                 <div style="border-top: 1px solid var(--border); margin-top: 30px; padding-top: 20px;">
-                    <label>Advance Paid (Balance Pending)</label>
-                    <div id="admin-half-list"></div>
+                    <label>Access List</label>
+                    <div id="admin-all-list" style="max-height: 300px; overflow-y: auto;"></div>
                 </div>
 
-                <div style="border-top: 1px solid var(--border); margin-top: 30px; padding-top: 20px;">
-                    <label>Fully Verified (Ready)</label>
-                    <div id="admin-all-list" style="max-height: 400px; overflow-y: auto;"></div>
-                </div>
-
-                <button class="btn btn-ghost" onclick="logout()">Logout Administrative Session</button>
+                <button class="btn btn-ghost" onclick="logout()">Logout Session</button>
             </div>
         </section>
     </div>
@@ -486,7 +392,6 @@
         const getCollection = () => db.collection('artifacts').doc(appId).collection('public').doc('data').collection('members');
 
         let currentMemberDoc = null;
-        let selectedPayType = 'full';
         let authInitialized = false;
 
         async function initAuth() {
@@ -514,15 +419,6 @@
             if (viewName === 'admin-dashboard') startAdminListener();
         }
 
-        function selectPayType(type) {
-            selectedPayType = type;
-            document.getElementById('opt-full').classList.toggle('active', type === 'full');
-            document.getElementById('opt-advance').classList.toggle('active', type === 'advance');
-            document.getElementById('upload-label').innerText = type === 'full' 
-                ? 'Upload Full Payment Slip (Rs. 5000.00)' 
-                : 'Upload Advance Payment Slip (Rs. 2500.00)';
-        }
-
         // --- 2. MEMBER FLOW ---
         async function memberAccess() {
             const name = document.getElementById('member-name-input').value.trim();
@@ -530,7 +426,7 @@
 
             const btn = document.getElementById('access-btn');
             btn.disabled = true;
-            btn.innerText = "Connecting...";
+            btn.innerText = "Synchronizing...";
 
             await initAuth();
             if (!auth.currentUser) return btn.disabled = false;
@@ -546,9 +442,7 @@
                         status: 'unpaid',
                         ticketID: 'T' + Math.floor(10000 + Math.random() * 89999),
                         slip: null,
-                        balanceSlip: null,
                         checkedIn: false,
-                        paymentType: null,
                         createdAt: firebase.firestore.FieldValue.serverTimestamp()
                     };
                     await memberRef.set(newMember);
@@ -564,6 +458,16 @@
                     if (snapshot.exists) {
                         currentMemberDoc = snapshot.data();
                         renderMemberUI();
+                    } else if (currentMemberDoc && currentMemberDoc.status !== 'verified') {
+                        const content = `
+                            <div style="padding: 10px 0;">
+                                <p style="color: var(--secondary); margin-bottom: 20px; line-height: 1.6;">Your payment proof was not accepted. Please try again and upload slip again.</p>
+                                <button class="btn" onclick="location.reload()">Reload & Try Again</button>
+                            </div>
+                        `;
+                        document.getElementById('modal-footer').classList.add('hidden');
+                        openModal(`Rejected`, content);
+                        currentMemberDoc = null;
                     }
                 });
 
@@ -576,60 +480,37 @@
 
         function renderMemberUI() {
             const display = document.getElementById('member-ticket-display');
-            const selectionZone = document.getElementById('payment-selection-zone');
-            const balanceZone = document.getElementById('balance-payment-zone');
+            const upload = document.getElementById('upload-zone');
             const u = currentMemberDoc;
             if(!u) return;
 
-            const isVerified = u.status === 'verified';
-            const isAdvanceVerified = u.status === 'advance_paid';
-            const isWaiting = u.status === 'waiting' || u.status === 'waiting_balance';
+            const isOk = u.status === 'verified';
+            const isWaiting = u.status === 'waiting';
             const isCheckedIn = u.checkedIn === true;
-            const isRejected = u.status === 'rejected';
-
-            let badgeClass = 'badge-wait';
-            let statusText = 'Payment Required';
-            
-            if (isCheckedIn) { badgeClass = 'badge-ok'; statusText = 'Checked In'; }
-            else if (isVerified) { badgeClass = 'badge-ok'; statusText = 'Access Verified'; }
-            else if (isAdvanceVerified) { badgeClass = 'badge-half'; statusText = 'Partially Paid'; }
-            else if (isWaiting) { badgeClass = 'badge-wait'; statusText = 'Review Pending'; }
-            else if (isRejected) { badgeClass = 'badge-danger'; statusText = 'Slip Rejected'; }
 
             display.innerHTML = `
-                ${isRejected ? `
-                    <div style="background: var(--danger-bg); border: 1px solid var(--danger); padding: 15px; border-radius: 12px; margin-bottom: 20px; color: var(--danger); font-weight: 600; text-align: center; font-size: 0.9rem;">
-                        Your payment slip was rejected. Please try again and upload a clear receipt.
-                    </div>
-                ` : ''}
                 <div class="ticket">
-                    <span class="badge ${badgeClass}">${statusText}</span>
+                    <span class="badge ${isCheckedIn ? 'badge-ok' : (isOk ? 'badge-ok' : 'badge-wait')}">
+                        ${isCheckedIn ? 'Checked In' : (isOk ? 'Access Verified' : (isWaiting ? 'In Review' : 'Payment Required'))}
+                    </span>
                     <span class="ticket-no">${u.ticketID}</span>
                     <p style="font-weight:700; font-size:1.2rem; margin:0; color: white;">${u.name}</p>
                     <p style="font-size: 0.85rem; color: var(--secondary); margin-top: 15px; line-height: 1.6;">
                         Venue: Ahaspokuna hotel<br>
                         Time: 9.00 am to 4.00 pm<br>
-                        <span style="color: var(--primary); font-weight: 800;">Total: Rs. 5000.00</span>
+                        <span style="color: var(--primary); font-weight: 800;">Price: Rs. 5000.00</span>
                     </p>
                 </div>
-                ${isVerified ? `<button class="btn btn-success" onclick="downloadTicketFromData()">Download Digital Pass</button>` : ''}
+                ${isOk ? `<button class="btn btn-success" onclick="downloadTicketFromData()">Download Digital Pass</button>` : ''}
             `;
 
-            selectionZone.classList.add('hidden');
-            balanceZone.classList.add('hidden');
-
-            if (u.status === 'unpaid' || u.status === 'rejected') {
-                selectionZone.classList.remove('hidden');
-            } else if (isWaiting) {
-                selectionZone.innerHTML = `
-                    <div style="text-align:center; padding: 25px; background: rgba(255,255,255,0.03); border-radius: 12px; border: 1px dashed var(--border);">
-                        <p style="color:var(--warning); margin:0; font-weight:600;">Receipt under review...</p>
-                        <p style="color:var(--secondary); font-size:0.8rem; margin-top:5px;">Check back once verified by admin.</p>
-                    </div>`;
-                selectionZone.classList.remove('hidden');
-            } else if (isAdvanceVerified) {
-                balanceZone.classList.remove('hidden');
-            }
+            if (u.status === 'unpaid') upload.classList.remove('hidden');
+            else if (isWaiting) {
+                upload.innerHTML = `<div style="text-align:center; padding: 20px; background: rgba(255,255,255,0.03); border-radius: 12px; border: 1px solid var(--border);">
+                    <p style="color:var(--primary); margin:0;">Receipt pending verification...</p>
+                </div>`;
+                upload.classList.remove('hidden');
+            } else upload.classList.add('hidden');
         }
 
         function uploadPayment() {
@@ -637,37 +518,12 @@
             if (!file) return toast("Select a file");
             const btn = document.getElementById('upload-btn');
             btn.disabled = true;
-            btn.innerText = "Uploading...";
-            
             const reader = new FileReader();
             reader.onload = async (e) => {
                 const docId = currentMemberDoc.name.toLowerCase().replace(/\s+/g, '_');
-                await getCollection().doc(docId).update({ 
-                    status: 'waiting', 
-                    slip: e.target.result,
-                    paymentType: selectedPayType 
-                });
-                toast("Payment submitted");
-                btn.disabled = false; btn.innerText = "Submit Verification";
-            };
-            reader.readAsDataURL(file);
-        }
-
-        async function uploadBalancePayment() {
-            const file = document.getElementById('balance-upload-input').files[0];
-            if (!file) return toast("Select a file");
-            const btn = document.getElementById('balance-btn');
-            btn.disabled = true; btn.innerText = "Processing...";
-
-            const reader = new FileReader();
-            reader.onload = async (e) => {
-                const docId = currentMemberDoc.name.toLowerCase().replace(/\s+/g, '_');
-                await getCollection().doc(docId).update({ 
-                    status: 'waiting_balance', 
-                    balanceSlip: e.target.result 
-                });
-                toast("Balance slip submitted");
-                btn.disabled = false; btn.innerText = "Submit Balance Receipt";
+                await getCollection().doc(docId).update({ status: 'waiting', slip: e.target.result });
+                toast("Slip submitted");
+                btn.disabled = false;
             };
             reader.readAsDataURL(file);
         }
@@ -676,6 +532,8 @@
         async function validateTicketID() {
             const idInput = document.getElementById('id-verify-input').value.trim().toUpperCase();
             if (!idInput) return toast("Enter Ticket ID");
+
+            toast("Verifying ID...");
             
             try {
                 const querySnapshot = await getCollection().get();
@@ -685,56 +543,60 @@
                 });
 
                 if (!found) {
-                    return openModal("Invalid ID", `
-                        <div style="text-align:center;" class="status-card-animate">
-                            <div style="width: 80px; height: 80px; background: var(--danger-bg); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 20px; border: 2px solid var(--danger);">
-                                <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="var(--danger)" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                    return openModal("Error", `
+                        <div style="padding: 10px; text-align: center;" class="status-card-animate">
+                            <div style="width: 70px; height: 70px; background: var(--danger-bg); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 20px; border: 2px solid var(--danger);">
+                                <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="var(--danger)" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
                             </div>
-                            <h2 style="color:var(--danger);">NOT FOUND</h2>
-                            <p style="color:var(--secondary);">This Ticket ID does not exist.</p>
+                            <h3 style="color: var(--danger); margin: 0;">Invalid Ticket</h3>
+                            <p style="color: var(--secondary); font-size: 0.9rem; margin-top: 10px;">The provided Ticket ID does not exist in the database.</p>
                         </div>
                     `);
                 }
 
                 if (found.status !== 'verified') {
-                    return openModal("Incomplete", `
-                        <div style="text-align:center;" class="status-card-animate">
-                             <div style="width: 80px; height: 80px; background: var(--warning-bg); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 20px; border: 2px solid var(--warning);">
-                                <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="var(--warning)" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>
+                    return openModal("Warning", `
+                        <div style="padding: 10px; text-align: center;" class="status-card-animate">
+                            <div style="width: 70px; height: 70px; background: var(--warning-bg); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 20px; border: 2px solid var(--warning);">
+                                <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="var(--warning)" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>
                             </div>
-                            <h2 style="color:var(--warning);">UNVERIFIED</h2>
-                            <p style="color:var(--secondary);">Member: <b>${found.name}</b></p>
-                            <p style="color:var(--warning);">Balance payment is required.</p>
+                            <h3 style="color: var(--warning); margin: 0;">Not Verified</h3>
+                            <p style="color: var(--secondary); font-size: 0.9rem; margin-top: 10px;">Payment for member <b>${found.name}</b> has not been approved yet.</p>
                         </div>
                     `);
                 }
 
                 if (found.checkedIn === true) {
-                    return openModal("Already Entered", `
-                        <div style="text-align:center;" class="status-card-animate">
-                            <div style="width: 80px; height: 80px; background: var(--danger-bg); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 20px; border: 2px solid var(--danger);">
-                                <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="var(--danger)" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path></svg>
+                    return openModal("Access Denied", `
+                        <div style="padding: 10px; text-align: center;" class="status-card-animate">
+                            <div style="width: 70px; height: 70px; background: var(--danger-bg); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 20px; border: 2px solid var(--danger);">
+                                <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="var(--danger)" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
                             </div>
-                            <h2 style="color:var(--danger); margin-bottom: 5px;">DENIED</h2>
-                            <p style="color:var(--text); font-weight: 800; font-size: 1.2rem; margin: 0;">${found.name}</p>
-                            <p style="color:var(--secondary); margin-top: 5px;">This member already checked in.</p>
+                            <h3 style="color: var(--danger); margin: 0;">Already Checked In</h3>
+                            <p style="color: var(--secondary); font-size: 0.9rem; margin-top: 10px;">Member <b>${found.name}</b> has already used this ticket to enter the venue.</p>
                         </div>
                     `);
                 }
 
+                // Success Logic
                 await getCollection().doc(found.id).update({ checkedIn: true, checkedInAt: firebase.firestore.FieldValue.serverTimestamp() });
-                openModal("Access Granted", `
-                    <div style="text-align:center;" class="status-card-animate">
-                        <div style="width: 100px; height: 100px; background: var(--success-bg); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 25px; border: 3px solid var(--success);">
-                            <svg width="50" height="50" viewBox="0 0 24 24" fill="none" stroke="var(--success)" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                
+                openModal("Success", `
+                    <div style="padding: 10px; text-align: center;" class="status-card-animate">
+                        <div style="width: 80px; height: 80px; background: var(--success-bg); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 20px; border: 2px solid var(--success);">
+                            <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="var(--success)" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
                         </div>
-                        <h2 style="color:var(--success); font-size: 2rem; margin-bottom: 5px;">SUCCESS</h2>
-                        <p style="font-size: 1.2rem; font-weight: 700;">${found.name}</p>
-                        <p style="color:var(--secondary);">Welcome to the event!</p>
+                        <h3 style="color: var(--success); margin: 0 0 10px; font-size: 1.6rem; letter-spacing: -0.02em;">Access Granted</h3>
+                        <p style="color: var(--text); font-weight: 700; font-size: 1.3rem; margin: 5px 0;">${found.name}</p>
+                        <p style="color: var(--secondary); font-size: 0.85rem; margin-bottom: 25px;">Ticket ID: <span style="color: var(--primary); font-family: monospace;">${found.ticketID}</span></p>
+                        <div style="background: rgba(16, 185, 129, 0.08); padding: 14px; border-radius: 16px; border: 1px solid rgba(16, 185, 129, 0.2);">
+                            <p style="color: var(--success); font-size: 0.75rem; font-weight: 800; margin: 0; text-transform: uppercase; letter-spacing: 0.1em;">Check-In Complete • Welcome</p>
+                        </div>
                     </div>
                 `);
                 document.getElementById('id-verify-input').value = '';
-            } catch (err) { toast("Check-in error"); }
+
+            } catch (err) { toast("Error during lookup"); }
         }
 
         function adminLogin() {
@@ -756,139 +618,54 @@
         function renderAdminUI(users) {
             const stats = document.getElementById('admin-stats-summary');
             const queue = document.getElementById('admin-queue-list');
-            const halfList = document.getElementById('admin-half-list');
-            const allList = document.getElementById('admin-all-list');
+            const all = document.getElementById('admin-all-list');
 
-            const waiting = users.filter(u => u.status === 'waiting' || u.status === 'waiting_balance');
+            const waiting = users.filter(u => u.status === 'waiting');
             const verified = users.filter(u => u.status === 'verified');
-            const halfPaid = users.filter(u => u.status === 'advance_paid');
-            const checkedInCount = users.filter(u => u.checkedIn === true).length;
+            const checkedIn = users.filter(u => u.checkedIn === true).length;
 
             stats.innerHTML = `
-                <div class="summary-card"><span class="summary-val">${users.length}</span><span class="summary-lab">Total</span></div>
-                <div class="summary-card"><span class="summary-val" style="color:var(--warning)">${waiting.length}</span><span class="summary-lab">Pending</span></div>
-                <div class="summary-card"><span class="summary-val" style="color:var(--primary)">${halfPaid.length}</span><span class="summary-lab">Half-Paid</span></div>
-                <div class="summary-card"><span class="summary-val" style="color:var(--success)">${checkedInCount}</span><span class="summary-lab">Entries</span></div>
+                <div class="summary-card"><span class="summary-val">${users.length}</span><span class="summary-lab">Members</span></div>
+                <div class="summary-card"><span class="summary-val" style="color:var(--warning)">${waiting.length}</span><span class="summary-lab">Queued</span></div>
+                <div class="summary-card"><span class="summary-val" style="color:var(--success)">${verified.length}</span><span class="summary-lab">Active</span></div>
+                <div class="summary-card"><span class="summary-val" style="color:var(--primary)">${checkedIn}</span><span class="summary-lab">Entered</span></div>
             `;
 
             queue.innerHTML = '';
             waiting.forEach(u => {
                 const div = document.createElement('div'); div.className = 'list-item';
-                const typeText = u.status === 'waiting_balance' ? 'BALANCE' : (u.paymentType === 'advance' ? 'ADVANCE' : 'FULL');
-                div.innerHTML = `
-                    <div style="font-size:0.85rem;">
-                        <b>${u.name}</b><br>
-                        <small style="color:var(--primary); font-weight:800;">VERIFY: ${typeText}</small>
-                    </div>
-                    <div style="display:flex; gap:5px;">
-                        <button class="btn btn-sm btn-ghost" onclick="viewSlips('${u.id}')">Slips</button>
-                        <button class="btn btn-sm" onclick="approveMember('${u.id}')">Approve</button>
-                        <button class="btn btn-sm btn-danger-ghost" onclick="initiateReject('${u.id}')">Reject</button>
-                    </div>`;
+                div.innerHTML = `<div style="font-size:0.85rem;">${u.name}</div><div style="display:flex; gap:5px;">
+                    <button class="btn btn-sm btn-ghost" onclick="viewSlip('${u.id}')">Slip</button>
+                    <button class="btn btn-sm" onclick="approve('${u.id}')">OK</button>
+                    <button class="btn btn-sm btn-danger-ghost" onclick="reject('${u.id}')">X</button>
+                </div>`;
                 queue.appendChild(div);
             });
 
-            halfList.innerHTML = halfPaid.length ? '' : '<p style="color:var(--muted); font-size: 0.8rem; padding: 10px 0;">No members with pending balance.</p>';
-            halfPaid.forEach(u => {
-                const div = document.createElement('div'); div.className = 'list-item';
-                div.innerHTML = `
-                    <div style="font-size:0.85rem;">${u.name}</div>
-                    <div style="display:flex; gap:5px;">
-                        <button class="btn btn-sm btn-ghost" onclick="viewSlips('${u.id}')">Slips</button>
-                        <button class="btn btn-sm btn-danger-ghost" onclick="initiateReject('${u.id}')">Reject</button>
-                    </div>`;
-                halfList.appendChild(div);
-            });
-
-            allList.innerHTML = '';
+            all.innerHTML = '';
             verified.forEach(u => {
                 const div = document.createElement('div'); div.className = 'list-item';
-                div.innerHTML = `<div style="font-size:0.85rem;">${u.name} <small style="color:var(--success)">${u.checkedIn ? '[IN]' : '[OK]'}</small></div>
-                    <div style="display:flex; gap:5px;">
-                        <button class="btn btn-sm btn-ghost" onclick="viewSlips('${u.id}')">Slips</button>
-                        <button class="btn btn-sm btn-ghost" onclick="previewTicket('${u.id}')">View Pass</button>
-                        <button class="btn btn-sm btn-ghost" onclick="downloadTicketFromId('${u.id}')">Pass</button>
-                    </div>`;
-                allList.appendChild(div);
+                div.innerHTML = `<div style="font-size:0.85rem;">${u.name} <small style="color:${u.checkedIn ? 'var(--success)' : 'var(--muted)'}">${u.checkedIn ? '(In)' : '(Idle)'}</small></div>
+                    <div style="display:flex; gap:4px; flex-wrap: wrap; justify-content: flex-end;">
+                    <button class="btn btn-sm btn-ghost" onclick="viewSlip('${u.id}')">Slip</button>
+                    <button class="btn btn-sm btn-ghost" onclick="viewCopy('${u.id}')">View</button>
+                    <button class="btn btn-sm btn-success" onclick="downloadTicketFromId('${u.id}')">Pass</button></div>`;
+                all.appendChild(div);
             });
         }
 
-        async function approveMember(id) {
+        async function approve(id) { await getCollection().doc(id).update({ status: 'verified' }); }
+        async function reject(id) { await getCollection().doc(id).delete(); }
+
+        async function viewSlip(id) {
             const doc = await getCollection().doc(id).get();
             const u = doc.data();
-            let nextStatus = 'verified';
-
-            if (u.status === 'waiting' && u.paymentType === 'advance') {
-                nextStatus = 'advance_paid';
-                toast("Advance Approved");
-            } else {
-                toast("Full Access Verified");
-            }
-
-            await getCollection().doc(id).update({ status: nextStatus });
-        }
-
-        function initiateReject(id) {
+            if (!u.slip) return toast("Slip missing");
             const content = `
-                <div style="text-align:center;">
-                    <p style="margin-bottom:20px;">Are you sure you want to reject this slip? The user will be reset and must re-upload.</p>
-                    <button class="btn btn-danger" onclick="executeReject('${id}')">Yes, Reject Slip</button>
-                </div>
+                <div style="margin-bottom: 15px;"><img src="${u.slip}" class="preview-img" style="margin-top:0;"></div>
+                <button class="btn btn-success" onclick="downloadFile('${u.name}_Slip', '${u.slip}')">Download Slip</button>
             `;
-            openModal("Reject Payment", content);
-        }
-
-        async function executeReject(id) {
-            await getCollection().doc(id).update({
-                status: 'rejected',
-                slip: null,
-                balanceSlip: null,
-                paymentType: null
-            });
-            closeModal();
-            toast("Payment rejected.");
-        }
-
-        async function previewTicket(id) {
-            const doc = await getCollection().doc(id).get();
-            const u = doc.data();
-            const content = `
-                <div class="ticket" style="margin:0; border-style:solid; border-width:1px;">
-                    <span class="badge badge-ok">${u.checkedIn ? 'CHECKED IN' : 'VERIFIED'}</span>
-                    <span class="ticket-no" style="font-size:1.5rem;">${u.ticketID}</span>
-                    <p style="font-weight:700; color:white;">${u.name}</p>
-                    <p style="font-size:0.75rem; color:var(--secondary);">Venue: Ahaspokuna hotel</p>
-                </div>
-            `;
-            openModal("Digital Ticket Preview", content);
-        }
-
-        async function viewSlips(id) {
-            const doc = await getCollection().doc(id).get();
-            const u = doc.data();
-            let content = '<div style="text-align:left;">';
-            
-            if (u.slip) {
-                content += `
-                    <div style="padding:15px; background: rgba(59,130,246,0.05); border-radius:15px; border:1px solid var(--border); margin-bottom: 20px;">
-                        <p style="color:var(--primary); font-weight:700; margin: 0 0 10px; font-size: 0.85rem; text-transform:uppercase;">1. Initial Payment Slip (${u.paymentType})</p>
-                        <img src="${u.slip}" class="preview-img">
-                        <button class="btn btn-sm" style="width:100%;" onclick="downloadFile('${u.name}_Initial_Slip', '${u.slip}')">Download Initial Receipt</button>
-                    </div>
-                `;
-            }
-            if (u.balanceSlip) {
-                content += `
-                    <div style="padding:15px; background: rgba(16,185,129,0.05); border-radius:15px; border:1px solid var(--border);">
-                        <p style="color:var(--success); font-weight:700; margin: 0 0 10px; font-size: 0.85rem; text-transform:uppercase;">2. Balance Payment Slip</p>
-                        <img src="${u.balanceSlip}" class="preview-img">
-                        <button class="btn btn-sm btn-success" style="width:100%;" onclick="downloadFile('${u.name}_Balance_Slip', '${u.balanceSlip}')">Download Balance Receipt</button>
-                    </div>
-                `;
-            }
-            content += '</div>';
-
-            openModal(`Receipt Management: ${u.name}`, content);
+            openModal(`Slip: ${u.name}`, content);
         }
 
         function downloadFile(fileName, dataUrl) {
@@ -896,7 +673,18 @@
             link.download = `${fileName.replace(/\s+/g, '_')}.png`;
             link.href = dataUrl;
             link.click();
-            toast("Download Triggered");
+        }
+
+        async function viewCopy(id) {
+            const doc = await getCollection().doc(id).get();
+            const u = doc.data();
+            openModal(`Pass Preview`, `<div class="ticket">
+                <span class="badge badge-ok">${u.checkedIn ? 'CHECKED IN' : 'VALID'}</span>
+                <span class="ticket-no">${u.ticketID}</span>
+                <p style="color:white; font-weight:700;">${u.name}</p>
+                <p style="font-size:0.75rem; color:var(--secondary); margin-top:10px; line-height:1.5;">Ahaspokuna hotel<br>
+                <span style="color: var(--primary); font-weight: 800;">Rs. 5000.00</span></p>
+            </div>`);
         }
 
         // --- 4. TICKET ENGINE ---
@@ -905,27 +693,33 @@
             const ctx = canvas.getContext('2d');
             ctx.clearRect(0, 0, canvas.width, canvas.height);
 
+            // BG & Borders
             ctx.fillStyle = '#1e293b'; ctx.fillRect(0, 0, canvas.width, canvas.height);
             ctx.strokeStyle = '#3b82f6'; ctx.lineWidth = 15; ctx.strokeRect(0, 0, canvas.width, canvas.height);
             ctx.setLineDash([10, 10]); ctx.lineWidth = 2; ctx.strokeRect(30, 30, canvas.width - 60, canvas.height - 60); ctx.setLineDash([]);
 
-            ctx.fillStyle = '#3b82f6'; ctx.font = 'bold 24px Arial'; ctx.textAlign = 'center'; ctx.fillText('OFFICIAL EVENT PASS', canvas.width/2, 80);
-            ctx.fillStyle = '#ffffff'; ctx.font = '900 70px Arial'; ctx.fillText(u.ticketID, canvas.width/2, 185);
-            ctx.fillStyle = '#3b82f6'; ctx.font = 'bold 32px Arial'; ctx.fillText(u.name.toUpperCase(), canvas.width/2, 245);
+            // Header & Content
+            ctx.fillStyle = '#3b82f6'; ctx.font = 'bold 24px Arial'; ctx.textAlign = 'center'; ctx.fillText('OFFICIAL EVENT ACCESS PASS', canvas.width/2, 80);
+            ctx.fillStyle = '#ffffff'; ctx.font = '900 65px Arial'; ctx.fillText(u.ticketID, canvas.width/2, 180);
+            ctx.fillStyle = '#3b82f6'; ctx.font = 'bold 30px Arial'; ctx.fillText(u.name.toUpperCase(), canvas.width/2, 240);
             
+            // Details
             ctx.fillStyle = '#f8fafc'; ctx.font = '18px Arial';
-            ctx.fillText('Venue: Ahaspokuna hotel', canvas.width/2, 300);
+            ctx.fillText('Venue: Green Vallet', canvas.width/2, 300);
+            ctx.fillText('Date: 2026/02/', canvas.width/2, 315);
             ctx.fillText('Time: 9.00 am to 4.00 pm', canvas.width/2, 330);
+            
+            // Price Tag
             ctx.fillStyle = '#3b82f6'; ctx.font = 'bold 22px Arial';
-            ctx.fillText('PAID IN FULL: RS. 5000.00', canvas.width/2, 375);
+            ctx.fillText('TICKET PRICE: RS. 3500.00', canvas.width/2, 375);
 
-            ctx.fillStyle = '#64748b'; ctx.font = '14px Arial'; ctx.fillText('Non-Transferable • Gate Verify Required', canvas.width/2, 435);
+            ctx.fillStyle = '#64748b'; ctx.font = '14px Arial'; ctx.fillText('Valid for single entry. Verify Ticket ID at gate.', canvas.width/2, 430);
             
             const link = document.createElement('a');
             link.download = `Pass_${u.name.replace(/\s+/g, '_')}.png`;
             link.href = canvas.toDataURL('image/png');
             link.click();
-            toast("Ticket downloaded");
+            toast("Download started");
         }
 
         function downloadTicketFromData() { generateTicket(currentMemberDoc); }
@@ -937,6 +731,7 @@
         function openModal(title, body) {
             document.getElementById('modal-title').innerText = title;
             document.getElementById('modal-body').innerHTML = body;
+            document.getElementById('modal-footer').classList.remove('hidden');
             document.getElementById('modal').style.display = 'flex';
         }
         function closeModal() { document.getElementById('modal').style.display = 'none'; }
@@ -944,4 +739,5 @@
         window.onload = initAuth;
     </script>
 </body>
+
 </html>
